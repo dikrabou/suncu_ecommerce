@@ -1,0 +1,2261 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - Optipharm{% endblock %}
+
+{% block content %}
+
+<div class="product-detail-page">
+
+    <!-- SECTON 1: GALERIE & ACHAT -->
+   {% load static %}
+
+<section class="pdp-main-section">
+    <div class="pdp-grid">
+        
+        <!-- COLONNE GAUCHE : Galerie d'images -->
+        <div class="pdp-gallery-wrapper">
+            <!-- Image Principale Grande -->
+            <div class="main-image-container">
+                {% if product.main_image %}
+                    <img id="mainProductImg" src="{{ product.main_image.url }}" alt="{{ product.name }}">
+                {% endif %}
+            </div>
+
+            <!-- Liste des vignettes (Thumbnails) -->
+            <div class="thumbnails-grid">
+                {% if product.main_image %}
+                    <img class="thumb active" src="{{ product.main_image.url }}" onclick="changeImage(this.src)" alt="{{ product.name }}">
+                {% endif %}
+                
+                {% for sec_image in product.secondary_images.all %}
+                    <img class="thumb" src="{{ sec_image.image.url }}" onclick="changeImage(this.src)" alt="{{ sec_image.alt_text|default:product.name }}">
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- COLONNE DROITE : Infos Produit (Sticky) -->
+        <div class="pdp-info-sticky">
+            <h1 class="pdp-title">{{ product.name }}</h1>
+            
+            <div class="pdp-price-rating">
+                <span class="pdp-price">DA {{ product.get_final_price }} DZD</span>
+                <span class="pdp-rating">★ {{ product.average_rating|floatformat:1 }}</span>
+            </div>
+
+            <!-- Formulaire d'ajout au panier -->
+            <form action="{% url 'add_to_cart' product.id %}" method="POST" class="pdp-buy-form" id="pdpForm">
+                {% csrf_token %}
+                <div class="quantity-picker">
+                    <button type="button" class="qty-btn" id="btn-decrease">−</button>
+                    <input type="number" name="quantity" id="qty-input" value="1" min="1" max="99" readonly>
+                    <button type="button" class="qty-btn" id="btn-increase">+</button>
+                </div>
+
+                <div class="pdp-actions">
+                    <button type="submit" class="btn-add-cart">AJOUTER AU PANIER</button>
+                    <button type="button" class="btn-buy-now" onclick="buyNow()">ACHETER MAINTENANT</button>
+                </div>
+            </form>
+
+            <!-- Highlights / Points forts -->
+            <ul class="pdp-highlights">
+                {% for line in product.highlights_list %}
+                    <li><span class="check">✓</span> {{ line }}</li>
+                {% endfor %}
+            </ul>
+
+            <!-- Accordéons Informations -->
+            <div class="pdp-accordions">
+                <div class="accordion-item">
+                    <button class="accordion-header" type="button">
+                        <span>Bienfaits</span>
+                        <span class="icon">+</span>
+                    </button>
+                    <div class="accordion-content">
+                        <p>{{ product.benefits|linebreaks }}</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" type="button">
+                        <span>Application</span>
+                        <span class="icon">+</span>
+                    </button>
+                    <div class="accordion-content">
+                        <p>{{ product.usage_instructions|linebreaks }}</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" type="button">
+                        <span>Ingrédients</span>
+                        <span class="icon">+</span>
+                    </button>
+                    <div class="accordion-content">
+                        <p>{{ product.ingredients|linebreaks }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cross-Sell Widget / Offre spéciale -->
+            {% if product.active_offer %}
+                {% with offer=product.active_offer %}
+                <div class="cross-sell-card">
+                    <span class="cross-sell-tag">OFFRE SPÉCIALE / PACK</span>
+                    <h4 class="offer-title">{{ offer.title }}</h4>
+
+                    <div class="cross-sell-body">
+                        <div class="cross-sell-products-list">
+                            <!-- 1. Produit principal -->
+                            <div class="pack-item">
+                                <div class="cross-sell-img">
+                                    {% if product.main_image %}
+                                        <img src="{{ product.main_image.url }}" alt="{{ product.name }}">
+                                    {% else %}
+                                        <img src="{% static 'images/placeholder.png' %}" alt="{{ product.name }}">
+                                    {% endif %}
+                                </div>
+                                <div class="cross-sell-info">
+                                    <h5>{{ product.name }} <span class="current-badge">(Ce produit)</span></h5>
+                                </div>
+                            </div>
+
+                            <!-- 2. Produits complémentaires -->
+                            {% for pack_product in product.other_offer_products %}
+                                <div class="pack-item">
+                                    <div class="cross-sell-img">
+                                        {% if pack_product.main_image %}
+                                            <img src="{{ pack_product.main_image.url }}" alt="{{ pack_product.name }}">
+                                        {% else %}
+                                            <img src="{% static 'images/placeholder.png' %}" alt="{{ pack_product.name }}">
+                                        {% endif %}
+                                    </div>
+                                    <div class="cross-sell-info">
+                                        <h5>+ {{ pack_product.name }}</h5>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Prix & Action -->
+                        <div class="cross-sell-action-zone">
+                            <div class="cross-sell-price">
+                                <span>Prix Total du Pack :</span>
+                                <strong>DA {{ offer.special_price }} DZD</strong>
+                            </div>
+
+                            <form action="#" method="POST" style="margin: 0;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-cross-sell">PROFITER DE L'OFFRE</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endwith %}
+            {% endif %}
+
+        </div> <!-- Fin pdp-info-sticky -->
+
+    </div> <!-- Fin pdp-grid -->
+</section>
+
+<!-- COMPOSANTS MODAUX ET PANIER (Placés en dehors de la grille principale) -->
+<div class="cart-overlay" id="cartOverlay"></div>
+
+<aside class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer-header">
+        <h3>Le panier (<span id="cartCountHeader">0 Objet</span>)</h3>
+        <button type="button" class="cart-close-btn" id="closeCart">&times;</button>
+    </div>
+
+    <div class="cart-promo-banner">
+        Toutes nos félicitations! Tes commandes se qualifient pour des expéditions gratuites
+    </div>
+
+    <div class="cart-drawer-items" id="cartItemsContainer">
+        <!-- Rempli dynamiquement via JS -->
+    </div>
+
+    <div class="cart-drawer-footer">
+        <div class="cart-extra-options">
+            <button type="button" class="accordion-btn">Ajouter des notes de commande <span>+</span></button>
+            <button type="button" class="accordion-btn">Est-ce un cadeau? <span>+</span></button>
+        </div>
+
+        <a href="/checkout/" class="btn-checkout">
+            CAISSET · <span id="drawerTotalPrice">0.00</span> DZD
+        </a>
+        <p class="cart-tax-note">Expédition & taxes calculées à la caisse</p>
+    </div>
+</aside>
+<style>/* Overlay sombre transparent */
+.cart-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.cart-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Panier Coulissant Droite */
+.cart-drawer {
+    position: fixed;
+    top: 0;
+    right: -420px; /* Caché à droite par défaut */
+    width: 400px;
+    max-width: 90vw;
+    height: 100vh;
+    background: #ffffff;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
+    transition: right 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.cart-drawer.open {
+    right: 0; /* Glisse vers l'intérieur */
+}
+
+/* Header Drawer */
+.cart-drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.cart-drawer-header h3 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.cart-close-btn {
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: #111;
+}
+
+/* Bannière promo */
+.cart-promo-banner {
+    background: #f7f7f7;
+    padding: 12px 20px;
+    font-size: 0.82rem;
+    color: #333;
+    text-align: center;
+    border-bottom: 2px solid #111;
+}
+
+/* Liste des articles */
+.cart-drawer-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.cart-item {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.cart-item-img {
+    width: 70px;
+    height: 85px;
+    background: #f9f9f9;
+    flex-shrink: 0;
+}
+
+.cart-item-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cart-item-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.cart-item-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+}
+
+.cart-item-header h4 {
+    margin: 0;
+    font-weight: 600;
+}
+
+.cart-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.mini-qty-picker {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    padding: 2px 8px;
+    gap: 10px;
+    font-size: 0.85rem;
+}
+
+.mini-qty-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-remove-item {
+    background: none;
+    border: none;
+    font-size: 0.8rem;
+    color: #777;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* Footer Drawer */
+.cart-drawer-footer {
+    padding: 20px;
+    border-top: 1px solid #f0f0f0;
+    background: #fff;
+}
+
+.cart-extra-options {
+    margin-bottom: 15px;
+}
+
+.accordion-btn {
+    width: 100%;
+    background: none;
+    border: none;
+    border-bottom: 1px solid #eee;
+    padding: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #444;
+    cursor: pointer;
+}
+
+.btn-checkout {
+    display: block;
+    width: 100%;
+    background: #000;
+    color: #fff;
+    text-align: center;
+    padding: 16px 0;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    font-size: 0.95rem;
+    margin-top: 10px;
+}
+
+.cart-tax-note {
+    font-size: 0.75rem;
+    color: #777;
+    text-align: center;
+    margin-top: 10px;
+}</style>
+    <!-- SECTION 2: BANIÈRE/FORMULE TEXTE[cite: 7] -->
+    <section class="pdp-formula-section">
+    <div class="pdp-formula-container">
+        
+        <!-- Colonne Gauche : Image du produit -->
+        <!-- Colonne Gauche : Carrousel automatique des images secondaires -->
+<div class="pdp-formula-image">
+    <div class="formula-slider" id="formulaSlider">
+        
+                <img src="{{ product.main_image.url }}" alt="{{ product.name }}" class="formula-slide active">
+        
+    </div>
+</div>
+
+        <!-- Colonne Droite : Textes -->
+        <div class="pdp-formula-content">
+            {% if product.active_ingredients_display %}
+                <p class="pdp-active-ingredients">
+                    {{ product.active_ingredients_display }}
+                </p>
+            {% endif %}
+
+            <h2 class="formula-title">{{ product.name }}</h2>
+
+            <div class="formula-desc">
+                {{ product.description|linebreaks }}
+            </div>
+        </div>
+
+    </div>
+</section>
+
+    <!-- SECTION 3: BEFORE / AFTER SLIDER[cite: 8] -->
+ {% if before_after %}
+<section class="before-after-wrapper">
+    <div class="ba-header">
+        <h2 class="section-title">{{ before_after.title }}</h2>
+        {% if before_after.short_description %}
+            <p class="section-subtitle">{{ before_after.short_description }}</p>
+        {% endif %}
+    </div>
+
+    <div class="ba-grid">
+        <!-- Colonne Gauche -->
+        <div class="ba-col ba-col-left">
+            {% for ingredient in product.active_ingredients_list.all|slice:":2" %}
+                <div class="ba-item">
+                    <h4>{{ ingredient.name }}</h4>
+                    <p>{{ ingredient.repair_method }}</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Colonne Centre (Slider) -->
+        <div class="ba-slider-container">
+            <div class="ba-image-before">
+                <img src="{{ before_after.before_image.url }}" alt="Avant">
+            </div>
+            <div class="ba-image-after" id="afterImage">
+                <img src="{{ before_after.after_image.url }}" alt="Après">
+            </div>
+            
+            <input type="range" min="0" max="100" value="50" class="ba-slider-input" id="baSlider">
+            
+            <!-- Handle vertical avec la puce circulaire < > -->
+            <div class="ba-slider-handle" id="baHandle">
+                <div class="ba-circle-button">
+                    <span>&lt;</span><span>&gt;</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Colonne Droite -->
+        <div class="ba-col ba-col-right">
+            {% for ingredient in product.active_ingredients_list.all|slice:"2:4" %}
+                <div class="ba-item">
+                    <h4>{{ ingredient.name }}</h4>
+                    <p>{{ ingredient.repair_method }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+{% if product.videos.all %}
+<section class="ugc-section">
+    <div class="ugc-header">
+        <h2>Ce sont nos clients qui en parlent le mieux.</h2>
+        <p>Vous aussi, partagez votre avant-après <span>@toucheskincare.lab</span></p>
+    </div>
+
+    <div class="ugc-carousel-wrapper" id="ugcWrapper">
+        <div class="ugc-track" id="ugcTrack">
+            {% for video in product.videos.all %}
+                <div class="ugc-card" data-index="{{ forloop.counter0 }}">
+                    <div class="ugc-card-inner">
+                        {% if video.video_file %}
+                            <video src="{{ video.video_file.url }}" muted playsinline preload="metadata"></video>
+                        {% endif %}
+                        <div class="ugc-play-icon">
+                            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                                <path d="M8 5v14l11-7z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+{% if product.active_ingredients_list.all %}
+<section class="ingredients-section">
+    <div class="ingredients-container">
+        <!-- Côté Texte -->
+        <div class="ingredients-content">
+            <span class="ingredients-subtitle">INGRÉDIENTS</span>
+            
+            <div class="ingredients-slider">
+                {% for ingredient in product.active_ingredients_list.all %}
+                    <div class="ingredient-slide {% if forloop.first %}active{% endif %}" data-index="{{ forloop.counter0 }}">
+                        <h2 class="ingredient-title">{{ ingredient.name }}</h2>
+                        <p class="ingredient-description">{{ ingredient.repair_method }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Côté Image Statique -->
+        <div class="ingredients-visual">
+            <div class="ingredients-image-wrapper">
+                {% for ingredient in product.active_ingredients_list.all %}
+                    {% if ingredient.image %}
+                        <img src="{{ ingredient.image.url }}" alt="{{ ingredient.name }}" class="ingredient-img {% if forloop.first %}active{% endif %}" data-index="{{ forloop.counter0 }}">
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+    <!-- SECTION 4: AVIS CLIENTS[cite: 9] -->
+    <!-- SECTION 4: AVIS CLIENTS -->
+<section class="reviews-section">
+    <div class="reviews-header">
+        <div class="reviews-avg">
+            <div class="stars">★ ★ ★ ★ ☆</div>
+            <span class="count">{{ product.reviews_count }} Avis</span>
+        </div>
+        <div class="reviews-actions">
+            <!-- Bouton Bash tstahl l'popup -->
+<button class="btn-write-review" onclick="openReviewModal()">Écrire un avis</button>
+
+<!-- Fenêtre Modale (Popup) -->
+<div id="reviewModal" class="review-modal-overlay">
+    <div class="review-modal-content">
+        
+        <!-- Token CSRF dyal Django (Mouhim bzaf bach matjiwch erreur 403) -->
+        {% csrf_token %}
+        
+        <!-- ID dyal l-produit (Ila knti f page ta3 produit) -->
+        <input type="hidden" id="product-id" value="{{ product.id }}">
+
+        <!-- Bouton Fermer (X) -->
+        <button class="modal-close" onclick="closeReviewModal()">&times;</button>
+
+        <!-- ÉTAPE 1 : Note fel nojoum -->
+        <div class="review-step active" data-step="1">
+            <h2>Comment décririez-vous cet article ?</h2>
+            <div class="interactive-stars">
+                <span data-rating="1">★</span>
+                <span data-rating="2">★</span>
+                <span data-rating="3">★</span>
+                <span data-rating="4">★</span>
+                <span data-rating="5">★</span>
+            </div>
+            <div class="star-labels">
+                <span id="starLabel">J'adore !</span>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 2 : Ajout d'images wla vidéos (Optionnel) -->
+        <div class="review-step" data-step="2">
+            <h2>Montrez-Le</h2>
+            <p class="modal-subtitle">Nous serions ravis de le voir !</p>
+            <div class="upload-promo-box">
+                <p class="promo-text">Obtenez 15% offerts sur votre prochain achat</p>
+                
+                <!-- Inputs ta3 les fichiers (cachés wla mstiwin b zine) -->
+                <input type="file" id="reviewImage" accept="image/*" style="display:none;" onchange="handleFileSelect('image')">
+                <input type="file" id="reviewVideo" accept="video/*" style="display:none;" onchange="handleFileSelect('video')">
+                
+                <button class="btn-black-outline" onclick="document.getElementById('reviewImage').click()">🖼️ Ajouter des photos</button>
+                <button class="btn-black-outline" onclick="document.getElementById('reviewVideo').click()">🎬 Ajouter une vidéo</button>
+                <span id="file-chosen-name" style="font-size:12px; color:green; display:block; margin-top:5px;"></span>
+            </div>
+            <div class="modal-footer-nav">
+                <button class="btn-text-back" onclick="prevStep()">← Retour</button>
+                <button class="btn-text-skip" onclick="nextStep()">Passer</button>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 3 : L'avis / Commentaire -->
+        <div class="review-step" data-step="3">
+            <h2>Nous en dire plus !</h2>
+            <textarea id="reviewComment" placeholder="Partagez votre expérience" rows="5"></textarea>
+            <div class="modal-footer-nav">
+                <button class="btn-text-back" onclick="prevStep()">← Retour</button>
+                <button class="btn-solid-next" onclick="nextStep()">Suivant</button>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 4 : Les informations dyal l client -->
+        <div class="review-step" data-step="4">
+            <h2>À propos de vous</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Prénom *</label>
+                    <input type="text" id="firstName" required>
+                </div>
+                <div class="form-group">
+                    <label>Nom de famille</label>
+                    <input type="text" id="lastName">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Email *</label>
+                <input type="email" id="userEmail" required>
+            </div>
+            <div class="modal-footer-nav">
+                <button class="btn-text-back" onclick="prevStep()">← Retour</button>
+                <button class="btn-solid-submit" onclick="submitReview()">C'est fait</button>
+            </div>
+        </div>
+
+        <!-- Les barres de progression fl-lwl -->
+        <div class="modal-progress-bars">
+            <span class="prog-bar active"></span>
+            <span class="prog-bar"></span>
+            <span class="prog-bar"></span>
+            <span class="prog-bar"></span>
+        </div>
+    </div>
+</div>
+        </div>
+    </div>
+
+    <div class="reviews-list">
+        {% for review in product.reviews.all %}
+            {% if review.is_approved %}
+            <div class="review-card">
+                <!-- Affichage de l'image si elle existe dans ton modèle -->
+                {% if review.image %}
+                <div class="review-image-wrapper">
+                    <img src="{{ review.image.url }}" alt="Photo avis client">
+                </div>
+                {% endif %}
+
+                <h4 class="reviewer-name">{{ review.user_name }}</h4>
+                <span class="review-date">{{ review.created_at|date:"d/m/Y" }}</span>
+                <div class="review-stars">
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
+                    {% endfor %}
+                </div>
+                <p class="review-comment">{{ review.comment }}</p>
+            </div>
+            {% endif %}
+        {% empty %}
+            <p>Aucun avis pour le moment.</p>
+        {% endfor %}
+    </div>
+</section>
+
+</div>
+
+<!-- Styles & Script JS -->
+<style>
+.review-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    justify-content: center; align-items: center;
+}
+.review-modal-content {
+    background: #fff; width: 90%; max-width: 600px;
+    padding: 40px; border-radius: 8px; position: relative;
+    text-align: center; font-family: sans-serif;
+}
+.modal-close {
+    position: absolute; top: 20px; left: 20px;
+    background: none; border: none; font-size: 24px; cursor: pointer;
+}
+.review-step { display: none; }
+.review-step.active { display: block; }
+.review-step h2 { font-size: 22px; margin-bottom: 10px; }
+
+/* Nojoum */
+.interactive-stars {
+    display: flex; justify-content: center; gap: 10px;
+    font-size: 38px; color: #ccc; cursor: pointer; margin: 20px 0;
+}
+.interactive-stars span.selected { color: #f59e0b; /* Jaune nojoum */ }
+
+/* Upload box */
+.upload-promo-box {
+    border: 1px dashed #ccc; padding: 20px; border-radius: 6px; margin: 20px 0; background: #fafafa;
+}
+.btn-black-outline {
+    display: block; width: 100%; background: #000; color: #fff;
+    border: none; padding: 10px; border-radius: 4px; cursor: pointer; margin-bottom: 8px;
+}
+.review-step textarea, .form-group input {
+    width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; outline: none; margin-top: 5px;
+}
+.form-row { display: flex; gap: 15px; margin-top: 15px; }
+.form-group { flex: 1; text-align: left; }
+.form-group label { font-size: 12px; font-weight: bold; }
+
+/* Navigation buttons & Progress bars */
+.modal-footer-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 30px; }
+.btn-text-back, .btn-text-skip { background: none; border: none; cursor: pointer; font-size: 14px; }
+.btn-solid-next, .btn-solid-submit { background: #000; color: #fff; border: none; padding: 10px 25px; border-radius: 4px; cursor: pointer; }
+.modal-progress-bars { display: flex; gap: 8px; margin-top: 25px; }
+.prog-bar { flex: 1; height: 4px; background: #e0e0e0; border-radius: 2px; }
+.prog-bar.active { background: #000; }
+    /* Section Avis Clients */
+.reviews-section {
+    max-width: 1200px;
+    margin: 60px auto;
+    padding: 0 20px;
+    font-family: inherit;
+}
+
+/* En-tête des avis (Étoiles/Compteur à gauche, Boutons à droite) */
+.reviews-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 20px;
+    margin-bottom: 40px;
+}
+
+.reviews-avg {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.reviews-avg .stars {
+    color: #000000;
+    font-size: 18px;
+    letter-spacing: 2px;
+}
+.review-image-wrapper img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+.reviews-avg .count {
+    font-size: 15px;
+    font-weight: 500;
+    color: #111111;
+}
+
+/* Boutons d'action à droite */
+.reviews-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.btn-write-review {
+    background-color: transparent;
+    border: 1px solid #cccccc;
+    color: #000000;
+    padding: 8px 16px;
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.btn-write-review:hover {
+    border-color: #000000;
+    background-color: #000000;
+    color: #ffffff;
+}
+
+/* Grille des cartes d'avis */
+.reviews-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 24px;
+}
+
+/* Style individuel d'une carte d'avis */
+.review-card {
+    background: #ffffff;
+    border: 1px solid #eaeaea;
+    border-radius: 6px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.review-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.reviewer-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #111111;
+    margin: 0;
+}
+
+.review-date {
+    font-size: 12px;
+    color: #888888;
+}
+
+.review-stars {
+    color: #000000;
+    font-size: 14px;
+    letter-spacing: 1px;
+    margin: 4px 0;
+}
+
+.review-comment {
+    font-size: 14px;
+    color: #444444;
+    line-height: 1.5;
+    margin: 0;
+}
+/* --- BASE PDP STYLES --- */
+
+
+
+.product-detail-page {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: system-ui, -apple-system, sans-serif;
+    color: #000;
+}
+
+/* --- STRUCTURE EN GRILLE PDP (2 COLONNES) --- */
+.pdp-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Galerie à gauche, Infos à droite */
+    gap: 40px;
+    align-items: start;
+}
+
+/* GALERIE & INFOS */
+.pdp-gallery-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.main-image-container img {
+    width: 100%;
+    height: 480px;
+    object-fit: cover;
+    border-radius: 12px;
+    background-color: #f6f6f6;
+}
+
+.thumbnails-grid {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+}
+
+.thumbnails-grid .thumb {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.thumbnails-grid .thumb:hover,
+.thumbnails-grid .thumb.active {
+    border-color: #000;
+}
+
+.pdp-info-sticky {
+    position: sticky;
+    top: 20px;
+    height: fit-content;
+}
+
+.pdp-title {
+    font-size: 2.2rem;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.pdp-price-rating {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+}
+
+.pdp-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.btn-add-cart {
+    flex: 1;
+    background: #000;
+    color: #fff;
+    padding: 16px;
+    border-radius: 25px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+
+.btn-add-cart:hover {
+    background-color: #222;
+}
+
+.btn-buy-now {
+    flex: 1;
+    background: #fff;
+    color: #000;
+    border: 1px solid #000;
+    padding: 16px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+
+.btn-buy-now:hover {
+    background-color: #f5f5f5;
+}
+
+.pdp-highlights {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.pdp-highlights li {
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+/* ACCORDÉONS */
+.pdp-accordions {
+    border-top: 1px solid #eee;
+    margin-top: 30px;
+}
+
+.accordion-item {
+    border-bottom: 1px solid #eee;
+}
+
+.accordion-header {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 18px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.accordion-content {
+    display: none;
+    padding-bottom: 15px;
+    color: #555;
+    font-size: 0.9rem;
+}
+
+/* CROSS SELL / PACK */
+.cross-sell-card {
+    background: #000;
+    color: #fff;
+    padding: 16px 20px;
+    border-radius: 12px;
+    margin-top: 30px;
+}
+
+.cross-sell-tag {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.8;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.cross-sell-body {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.cross-sell-products-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.pack-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cross-sell-img img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 8px;
+    background-color: #fff;
+}
+
+.cross-sell-info h5 {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin: 0;
+    color: #fff;
+}
+
+.current-badge {
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+.cross-sell-action-zone {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #333;
+    padding-top: 12px;
+    margin-top: 5px;
+}
+
+.cross-sell-price {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.85rem;
+}
+
+.btn-cross-sell {
+    background: #fff;
+    color: #000;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.2s ease;
+}
+
+.btn-cross-sell:hover {
+    background-color: #e0e0e0;
+}
+
+/* SÉLECTEUR DE QUANTITÉ */
+.quantity-picker {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #111111;
+    border-radius: 50px;
+    padding: 4px 12px;
+    width: 130px;
+    margin-bottom: 20px;
+    background-color: #ffffff;
+}
+
+.qty-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #111111;
+    padding: 6px 10px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.qty-btn:hover {
+    background-color: #f0f0f0;
+}
+
+.quantity-picker input[type="number"] {
+    width: 36px;
+    border: none;
+    background: transparent;
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 600;
+    outline: none;
+    -moz-appearance: textfield;
+}
+
+.quantity-picker input[type="number"]::-webkit-outer-spin-button,
+.quantity-picker input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* --- PANIER COULISSANT (CART DRAWER) & OVERLAY --- */
+.cart-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 998;
+}
+
+.cart-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.cart-drawer {
+    position: fixed;
+    top: 0;
+    right: -420px; /* Masqué à droite par défaut */
+    width: 100%;
+    max-width: 400px;
+    height: 100vh;
+    background-color: #fff;
+    box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 999;
+}
+
+.cart-drawer.open {
+    right: 0; /* Glisse vers l'intérieur lors de l'activation */
+}
+
+.cart-drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.cart-close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.cart-promo-banner {
+    background-color: #f7f7f7;
+    padding: 10px 20px;
+    font-size: 0.8rem;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.cart-drawer-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.cart-drawer-footer {
+    padding: 20px;
+    border-top: 1px solid #eee;
+    background: #fff;
+}
+
+.btn-checkout {
+    display: block;
+    width: 100%;
+    background: #000;
+    color: #fff;
+    text-align: center;
+    padding: 15px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    margin-top: 15px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+    .pdp-grid {
+        grid-template-columns: 1fr;
+    }
+}
+/* ==========================================================================
+   SÉLECTEUR DE QUANTITÉ (PILULE)
+   ========================================================================== */
+.quantity-picker {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #111111;
+    border-radius: 50px;
+    padding: 4px 12px;
+    width: 130px;
+    margin-bottom: 20px;
+    background-color: #ffffff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Effet au survol du bloc complet */
+.quantity-picker:hover {
+    border-color: #000000;
+}
+
+.qty-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    line-height: 1;
+    font-weight: 500;
+    cursor: pointer;
+    color: #111111;
+    padding: 6px 10px;
+    border-radius: 50%;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease, transform 0.1s ease, color 0.2s ease;
+}
+
+/* Survol et clic sur les boutons − et + */
+.qty-btn:hover {
+    background-color: #f0f0f0;
+    color: #000000;
+}
+
+.qty-btn:active {
+    transform: scale(0.9);
+}
+
+.qty-btn:focus-visible {
+    outline: 2px solid #000000;
+    outline-offset: 1px;
+}
+
+/* Champ de saisie numérique */
+.quantity-picker input[type="number"] {
+    width: 36px;
+    border: none;
+    background: transparent;
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #111111;
+    outline: none;
+    /* Masquer les flèches HTML native (Firefox) */
+    -moz-appearance: textfield;
+}
+
+/* Masquer les flèches HTML native (Chrome, Safari, Edge, Opera) */
+.quantity-picker input[type="number"]::-webkit-outer-spin-button,
+.quantity-picker input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* ==========================================================================
+   BADGE PRODUIT ACTUEL
+   ========================================================================== */
+.current-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    color: #d35400;
+    background-color: #ffffff;
+    border: 1px solid #ffffff;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    margin-left: 6px;
+    vertical-align: middle;
+    letter-spacing: 0.3px;
+}
+
+/* Section Globale */
+.pdp-formula-section {
+    width: 100%;
+    background-color: #ffffff; /* Ajuste la couleur de fond selon ton design */
+    padding: 60px 20px;
+}
+
+/* Alignement en 2 colonnes */
+.pdp-formula-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center; /* Aligne verticalement l'image et le texte */
+    gap: 50px; /* Espace entre l'image et la colonne de texte */
+}
+
+/* Colonne Image (Largeur 50%) */
+.pdp-formula-image {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.pdp-formula-image img {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+/* Colonne Texte (Largeur 50%) */
+.pdp-formula-content {
+    flex: 1;
+    text-align: center; /* Aligne le texte au centre comme sur la maquette */
+    padding: 0 20px;
+}
+
+/* Ingrédients Actifs (Haut) */
+.pdp-active-ingredients {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #333333;
+    margin-bottom: 15px;
+}
+
+/* Titre du Produit */
+.formula-title {
+    font-size: 4rem;
+    font-weight: 750;
+    line-height: 1.1;
+    color: #111111;
+    margin-bottom: 25px;
+    font-family: inherit; /* Ou une police élégante comme Playfair Display, Serif, etc. */
+}
+
+/* Description */
+.formula-desc p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #444444;
+    margin-bottom: 12px;
+}
+
+/* --- Responsive (Mobile / Tablette) --- */
+@media (max-width: 768px) {
+    .pdp-formula-container {
+        flex-direction: column; /* Empile l'image et le texte sur écran mobile */
+        gap: 30px;
+    }
+
+    .pdp-formula-content {
+        padding: 0;
+    }
+
+    .formula-title {
+        font-size: 2rem;
+    }
+}
+.ba-slider-container {
+    position: relative;
+    width: 100%;
+    max-width: 450px;
+    height: 400px;
+    overflow: hidden;
+}
+
+.ba-image-before,
+.ba-image-after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.ba-image-before img,
+.ba-image-after img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* L'image "Après" est rognée selon le pourcentage */
+.ba-image-after {
+    width: 50%;
+    overflow: hidden;
+    z-index: 2;
+}
+
+/* Curseur invisible superposé */
+.ba-slider-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    z-index: 4;
+    cursor: ew-resize;
+}
+
+/* Ligne / Poignée verticale séparatrice */
+.ba-slider-handle {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    background: #ffffff;
+    z-index: 3;
+    pointer-events: none;
+    transform: translateX(-50%);
+}/* ==========================================================================
+   SECTION BEFORE / AFTER - STYLE PIXEL PERFECT
+   ========================================================================== */
+.before-after-wrapper {
+    max-width: 1200px;
+    margin: 60px auto;
+    padding: 0 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #111111;
+}
+
+/* En-tête */
+.ba-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.section-title {
+    font-size: 2.2rem;
+    font-weight: 500;
+    margin-bottom: 10px;
+    letter-spacing: -0.5px;
+}
+
+.section-subtitle {
+    font-size: 0.95rem;
+    color: #666666;
+    margin: 0;
+}
+
+/* Disposition Grille 3 Colonnes */
+.ba-grid {
+    display: grid;
+    grid-template-columns: 1fr 420px 1fr;
+    gap: 40px;
+    align-items: center;
+}
+
+/* Colonnes de texte (Gauche & Droite) */
+.ba-col {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.ba-col-left {
+    text-align: center;
+}
+
+.ba-col-right {
+    text-align: center;
+}
+
+.ba-item h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #111111;
+    margin: 0 0 10px 0;
+    letter-spacing: -0.2px;
+}
+
+.ba-item p {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: #777777;
+    margin: 0;
+}
+
+/* Conteneur du Slider Comparateur */
+.ba-slider-container {
+    position: relative;
+    width: 100%;
+    height: 480px;
+    border-radius: 4px;
+    overflow: hidden;
+    user-select: none;
+}
+
+.ba-image-before,
+.ba-image-after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.ba-image-before img,
+.ba-image-after img {
+    width: 420px;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.ba-image-after {
+    width: 50%;
+    overflow: hidden;
+    z-index: 2;
+}
+
+/* Input Range invisible au-dessus */
+.ba-slider-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    z-index: 5;
+    cursor: ew-resize;
+    margin: 0;
+}
+
+/* Ligne séparatrice verticale */
+.ba-slider-handle {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    background-color: #ffffff;
+    z-index: 4;
+    transform: translateX(-50%);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Bouton rond central avec flèches < > */
+.ba-circle-button {
+    width: 32px;
+    height: 32px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    color: #333333;
+    font-size: 0.65rem;
+    font-weight: 600;
+}
+
+/* Responsive tablette/mobile */
+@media (max-width: 900px) {
+    .ba-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .ba-slider-container {
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+    .ba-image-before img,
+    .ba-image-after img {
+        width: 100%;
+    }
+}
+
+
+
+
+/* ==========================================================================
+   SECTION GALERIE VIDÉOS CLIENTS (FORMAT REELS / TIKTOK)
+   ========================================================================== */
+/* ==========================================================================
+   SECTION REVIEWS / UGC (FIDÈLE À LA VIDÉO)
+   ========================================================================== */
+/* ==========================================================================
+   SECTION UGC / REVIEWS (GRAND FORMAT + BORDURES DECORATIVES)
+   ========================================================================== */
+.ugc-section {
+    padding: 60px 0;
+    text-align: center;
+    background: #fff;
+    overflow: hidden;
+}
+
+.ugc-header h2 {
+    font-size: 2.2rem;
+    font-weight: 500;
+    color: #111;
+    margin-bottom: 8px;
+}
+
+.ugc-header p {
+    font-size: 0.95rem;
+    color: #666;
+    margin-bottom: 40px;
+}
+
+.ugc-carousel-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    padding: 40px 0;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+}
+
+.ugc-carousel-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+.ugc-track {
+    display: inline-flex;
+    gap: 20px;
+    padding: 0 calc(50vw - 140px);
+    align-items: center;
+}
+
+/* 80% taille f les côtés */
+.ugc-card {
+    position: relative;
+    width: 230px;
+    height: 400px;
+    border-radius: 0px;
+    overflow: hidden;
+    flex-shrink: 0;
+    cursor: pointer;
+    opacity: 0.5;
+    transform: scale(0.80);
+    transition: transform 0.4s ease, opacity 0.4s ease, box-shadow 0.4s ease;
+}
+
+.ugc-card-inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.ugc-card video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* 90% / Grande taille f le centre */
+.ugc-card.active {
+    transform: scale(1.12);
+    opacity: 1;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+    z-index: 10;
+}
+
+.ugc-card.active .ugc-play-icon {
+    display: none;
+}
+
+.ugc-play-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    pointer-events: none;
+}
+
+
+/* 1. Réinitialisation globale pour éliminer les espaces sur la page */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden; /* Évite le défilement horizontal indésirable */
+}
+
+/* 2. Section Ingrédients en pleine largeur (100vw) */
+.ingredients-section {
+    width: 100vw;               /* Force la largeur sur 100% de la fenêtre */
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;         /* Sort de n'importe quel conteneur parent restreint */
+    margin-right: -50vw;
+    background-color: #fcfcfc;
+    padding: 80px 10%;          /* Marge interne pour aérer le contenu */
+    box-sizing: border-box;
+}
+
+/* 3. Conteneur interne centré avec espace maximal */
+.ingredients-container {
+    max-width: 1400px;          /* Ajuste cette valeur selon tes préférences */
+    width: 100%;
+    margin: 0 auto;             /* Centre le contenu au milieu de la section */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+}
+
+/* Styles inchangés du contenu */
+.ingredients-subtitle {
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #444;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 25px;
+}
+
+.ingredients-slider {
+    position: relative;
+    min-height: 220px;
+}
+
+.ingredient-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    opacity: 0;
+    transform: translateY(15px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    pointer-events: none;
+}
+
+.ingredient-slide.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.ingredient-title {
+    font-size: 3.5rem;
+    font-weight: 400;
+    color: #000;
+    margin-bottom: 20px;
+    line-height: 1.1;
+}
+
+.ingredient-description {
+    font-size: 1.1rem;
+    color: #333;
+    line-height: 1.6;
+    max-width: 500px;
+}
+
+.ingredients-visual {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ingredients-image-wrapper {
+    position: relative;
+    width: 380px;
+    height: 380px;
+}
+
+.ingredient-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+}
+
+.ingredient-img.active {
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .ingredients-section {
+        padding: 50px 5%;
+    }
+    
+    .ingredients-container {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .ingredient-title {
+        font-size: 2.5rem;
+    }
+
+    .ingredients-image-wrapper {
+        width: 260px;
+        height: 260px;
+    }
+}
+</style>
+<script>
+    let currentStep = 1;
+let selectedRating = 5;
+
+function openReviewModal() {
+    document.getElementById('reviewModal').style.display = 'flex';
+    showStep(1);
+}
+
+function closeReviewModal() {
+    document.getElementById('reviewModal').style.display = 'none';
+}
+
+function showStep(step) {
+    currentStep = step;
+    document.querySelectorAll('.review-step').forEach(el => el.classList.remove('active'));
+    document.querySelector(`.review-step[data-step="${step}"]`).classList.add('active');
+    
+    document.querySelectorAll('.prog-bar').forEach((bar, index) => {
+        if (index < step) bar.classList.add('active');
+        else bar.classList.remove('active');
+    });
+}
+
+function nextStep() { if (currentStep < 4) showStep(currentStep + 1); }
+function prevStep() { if (currentStep > 1) showStep(currentStep - 1); }
+
+// Gestion des Nojoum
+const stars = document.querySelectorAll('.interactive-stars span');
+stars.forEach((star, index) => {
+    star.addEventListener('click', () => {
+        selectedRating = index + 1;
+        stars.forEach((s, i) => {
+            if (i <= index) s.classList.add('selected');
+            else s.classList.remove('selected');
+        });
+        setTimeout(() => { nextStep(); }, 300); // Passage automatique l étape 2
+    });
+});
+
+// Affichage simu taç ism l'fichier li tختار
+function handleFileSelect(type) {
+    const input = document.getElementById(type === 'image' ? 'reviewImage' : 'reviewVideo');
+    if (input.files[0]) {
+        document.getElementById('file-chosen-name').innerText = "Fichier sélectionné : " + input.files[0].name;
+    }
+}
+
+// Enregistrement fel Base de Données (Django Backend)
+function submitReview() {
+    const formData = new FormData();
+    
+    const productId = document.getElementById('product-id') ? document.getElementById('product-id').value : '';
+    const firstName = document.getElementById('firstName').value;
+    const email = document.getElementById('userEmail').value;
+
+    if (!firstName || !email) {
+        alert("3afak 3amar l'prénom w l'email!");
+        return;
+    }
+
+    if (productId) formData.append('product_id', productId);
+    formData.append('rating', selectedRating);
+    formData.append('comment', document.getElementById('reviewComment').value);
+    formData.append('first_name', firstName);
+    formData.append('last_name', document.getElementById('lastName').value);
+    
+    // Fichiers
+    const imageFile = document.getElementById('reviewImage').files[0];
+    const videoFile = document.getElementById('reviewVideo').files[0];
+    if (imageFile) formData.append('image', imageFile);
+    if (videoFile) formData.append('video', videoFile);
+
+    // CSRF Token ta3 Django
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    // Requête AJAX Fetch l backend
+    fetch('/api/reviews/store/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert("Mrc! L'avis dyalk tssajel bnjah w ghadi yban mli ydirlo l'admin validation.");
+            closeReviewModal();
+        } else {
+            alert("Erreur: " + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert("Problème technique!");
+    });
+}
+</script>
+<script>
+// Accordion Toggle Logic[cite: 13]
+document.querySelectorAll('.accordion-header').forEach(button => {
+    button.addEventListener('click', () => {
+        const content = button.nextElementSibling;
+        const icon = button.querySelector('.icon');
+        const isOpen = content.style.display === 'block';
+
+        document.querySelectorAll('.accordion-content').forEach(c => c.style.display = 'none');
+        document.querySelectorAll('.accordion-header .icon').forEach(i => i.textContent = '+');
+
+        if (!isOpen) {
+            content.style.display = 'block';
+            icon.textContent = '−';
+        }
+    });
+});
+
+// Before / After Interactive Slider[cite: 8]
+const slider = document.getElementById('baSlider');
+const afterImage = document.getElementById('afterImage');
+
+if(slider && afterImage) {
+    slider.addEventListener('input', (e) => {
+        afterImage.style.width = `${e.target.value}%`;
+    });
+}
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const btnDecrease = document.getElementById('btn-decrease');
+    const btnIncrease = document.getElementById('btn-increase');
+    const qtyInput = document.getElementById('qty-input');
+
+    if (btnDecrease && btnIncrease && qtyInput) {
+        btnDecrease.addEventListener('click', () => {
+            let currentValue = parseInt(qtyInput.value) || 1;
+            if (currentValue > 1) {
+                qtyInput.value = currentValue - 1;
+            }
+        });
+
+        btnIncrease.addEventListener('click', () => {
+            let currentValue = parseInt(qtyInput.value) || 1;
+            qtyInput.value = currentValue + 1;
+        });
+    }
+});
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    const slider = document.getElementById('baSlider');
+    const afterImage = document.getElementById('afterImage');
+    const handle = document.getElementById('baHandle');
+
+    if (slider && afterImage && handle) {
+        slider.addEventListener('input', function (e) {
+            const value = e.target.value;
+            afterImage.style.width = `${value}%`;
+            handle.style.left = `${value}%`;
+        });
+    }
+});document.addEventListener('DOMContentLoaded', function () {
+    const wrapper = document.getElementById('ugcWrapper');
+    const cards = document.querySelectorAll('.ugc-card');
+    if (!cards.length) return;
+
+    let currentIndex = 0;
+    let timer3s = null;
+    let isClickedByUser = false;
+
+    function updateActiveCard() {
+        if (timer3s) clearTimeout(timer3s);
+
+        cards.forEach((card, index) => {
+            const video = card.querySelector('video');
+            
+            if (index === currentIndex) {
+                card.classList.add('active');
+                
+                const cardOffset = card.offsetLeft - (wrapper.clientWidth / 2) + (card.clientWidth / 2);
+                wrapper.scrollTo({ left: cardOffset, behavior: 'smooth' });
+
+                if (video) {
+                    video.currentTime = 0;
+                    video.loop = false;
+                    video.play().catch(() => {});
+
+                    if (isClickedByUser) {
+                        video.onended = function () {
+                            isClickedByUser = false;
+                            nextSlide();
+                        };
+                    } else {
+                        video.onended = null;
+                        timer3s = setTimeout(() => {
+                            nextSlide();
+                        }, 3000);
+                    }
+                } else {
+                    timer3s = setTimeout(() => {
+                        nextSlide();
+                    }, 3000);
+                }
+            } else {
+                card.classList.remove('active');
+                if (video) {
+                    video.pause();
+                    video.onended = null;
+                }
+            }
+        });
+    }
+
+    function nextSlide() {
+        currentIndex = (currentIndex + 1) % cards.length;
+        updateActiveCard();
+    }
+
+    cards.forEach((card, index) => {
+        card.addEventListener('click', () => {
+            currentIndex = index;
+            isClickedByUser = true;
+            updateActiveCard();
+        });
+    });
+
+    updateActiveCard();
+});
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    const slides = document.querySelectorAll('.ingredient-slide');
+    const images = document.querySelectorAll('.ingredient-img');
+    
+    if (slides.length <= 1) return;
+
+    let currentIndex = 0;
+
+    function nextIngredient() {
+        // Enlever la classe active du texte et de l'image actuels
+        slides[currentIndex].classList.remove('active');
+        if (images[currentIndex]) images[currentIndex].classList.remove('active');
+
+        // Calcul de l'index suivant
+        currentIndex = (currentIndex + 1) % slides.length;
+
+        // Activer le texte et l'image suivants
+        slides[currentIndex].classList.add('active');
+        if (images[currentIndex]) images[currentIndex].classList.add('active');
+    }
+
+    // Changement automatique toutes les 5 secondes (5000 ms)
+    setInterval(nextIngredient,3000);
+});
+
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    const cartDrawer = document.getElementById('cartDrawer');
+    const cartOverlay = document.getElementById('cartOverlay');
+    const closeCartBtn = document.getElementById('closeCart');
+    const pdpForm = document.getElementById('pdpForm');
+    const cartItemsContainer = document.getElementById('cartItemsContainer');
+    const cartCountHeader = document.getElementById('cartCountHeader');
+    const drawerTotalPrice = document.getElementById('drawerTotalPrice');
+
+    // Récupérer le token CSRF
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
+
+    // Ouvrir / Fermer le Drawer
+    function openCart() {
+        cartDrawer.classList.add('open');
+        cartOverlay.classList.add('active');
+    }
+
+    function closeCart() {
+        cartDrawer.classList.remove('open');
+        cartOverlay.classList.remove('active');
+    }
+
+    if (closeCartBtn) closeCartBtn.addEventListener('click', closeCart);
+    if (cartOverlay) cartOverlay.addEventListener('click', closeCart);
+
+    // Rendu HTML dynamique du Panier
+    function renderCart(cartData) {
+        cartCountHeader.textContent = `${cartData.total_count} Objet${cartData.total_count > 1 ? 's' : ''}`;
+        drawerTotalPrice.textContent = cartData.subtotal.toLocaleString('fr-FR', { minimumFractionDigits: 2 });
+
+        if (!cartData.items || cartData.items.length === 0) {
+            cartItemsContainer.innerHTML = '<p class="empty-cart-msg">Votre panier est vide.</p>';
+            return;
+        }
+
+        let html = '';
+        cartData.items.forEach(item => {
+            html += `
+                <div class="cart-item" data-id="${item.id}">
+                    <div class="cart-item-img">
+                        <img src="${item.image_url}" alt="${item.name}">
+                    </div>
+                    <div class="cart-item-details">
+                        <div class="cart-item-header">
+                            <h4>${item.name}</h4>
+                            <span class="cart-item-price">${item.item_total.toLocaleString('fr-FR')} DZD</span>
+                        </div>
+                        <div class="cart-item-actions">
+                            <div class="mini-qty-picker">
+                                <button type="button" class="mini-qty-btn decrease-btn" data-id="${item.id}">-</button>
+                                <span class="mini-qty-val">${item.quantity}</span>
+                                <button type="button" class="mini-qty-btn increase-btn" data-id="${item.id}">+</button>
+                            </div>
+                            <button type="button" class="btn-remove-item" data-id="${item.id}">Retirer</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        cartItemsContainer.innerHTML = html;
+        attachItemEvents();
+    }
+
+    // Charger le panier au chargement de la page
+    function loadCart() {
+        fetch('/cart/get/')
+            .then(res => res.json())
+            .then(data => renderCart(data.cart));
+    }
+
+    // Attacher les événements (+ / - / Retirer)
+    function attachItemEvents() {
+        document.querySelectorAll('.increase-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                updateQty(this.dataset.id, 'increase');
+            });
+        });
+
+        document.querySelectorAll('.decrease-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                updateQty(this.dataset.id, 'decrease');
+            });
+        });
+
+        document.querySelectorAll('.btn-remove-item').forEach(btn => {
+            btn.addEventListener('click', function () {
+                removeItem(this.dataset.id);
+            });
+        });
+    }
+
+    // Mettre à jour les quantités (+/-)
+    function updateQty(productId, action) {
+        const formData = new FormData();
+        formData.append('action', action);
+
+        fetch(`/cart/update/${productId}/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': getCSRFToken() },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') renderCart(data.cart);
+        });
+    }
+
+    // Supprimer un article
+    function removeItem(productId) {
+        fetch(`/cart/remove/${productId}/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': getCSRFToken() }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') renderCart(data.cart);
+        });
+    }
+
+    // Soumission du formulaire PDP (Ajout au panier)
+    if (pdpForm) {
+        pdpForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(pdpForm);
+
+            fetch(pdpForm.action, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCSRFToken() },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    renderCart(data.cart);
+                    openCart();
+                }
+            });
+        });
+    }
+
+    // Initialisation
+    loadCart();
+});
+
+function buyNow() {
+    var form = document.getElementById('pdpForm');
+    form.action = "{% url 'buy_now' product.id %}";
+    form.submit();
+}
+
+
+    // Fonction pour changer l'image principale au clic sur une vignette
+    function changeImage(src) {
+        const mainImg = document.getElementById('mainProductImg');
+        if (mainImg) {
+            mainImg.src = src;
+        }
+
+        document.querySelectorAll('.thumbnails-grid .thumb').forEach(thumb => {
+            thumb.classList.remove('active');
+            if (thumb.src === src) {
+                thumb.classList.add('active');
+            }
+        });
+    }
+</script>
+{% endblock %}

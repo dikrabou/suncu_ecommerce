@@ -1,0 +1,463 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if current_usage %}
+        {{ current_usage.name }} - Optipharm
+    {% else %}
+        Catalogue Produits - Optipharm
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<!-- 1. Hero Banner Style Touché Lab -->
+<section class="hero-banner" style="background-image: url('{% static 'images/66.jpg' %}');">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <h1 class="hero-title">
+            {% if current_usage %}
+                {{ current_usage.name }}
+            {% else %}
+                Tous nos produits
+            {% endif %}
+        </h1>
+    </div>
+</section>
+
+<!-- 2. Section Before - After & Routine -->
+{% if before_after %}
+<section class="before-after-section">
+    <div class="before-after-header">
+        <h2 class="before-after-title">
+            {{ before_after.title }}
+        </h2>
+        
+        {% if before_after.short_description %}
+            <p class="before-after-desc">
+                {{ before_after.short_description }}
+            </p>
+        {% endif %}
+    </div>
+
+   <div class="before-after-grid">
+    <!-- Colonne Gauche : 2 premiers Principes Actifs -->
+    <div class="ba-col-left">
+        {% for ingredient in before_after.product.active_ingredients_list.all|slice:":2" %}
+            <div class="ba-info-group">
+                <h4 class="ba-subtitle">{{ ingredient.name }}</h4>
+                <p class="ba-text">{{ ingredient.repair_method }}</p>
+            </div>
+        
+        {% endfor %}
+    </div>
+
+    <!-- Centre : Visuel Avant / Après -->
+    <div class="ba-col-center">
+        <div class="ba-images-wrapper">
+            <div class="ba-image-container">
+                <span class="ba-badge">AVANT</span>
+                <img src="{{ before_after.before_image.url }}" alt="Photo Avant - {{ before_after.product.name }}" class="ba-image">
+            </div>
+
+            <div class="ba-image-container">
+                <span class="ba-badge">APRÈS</span>
+                <img src="{{ before_after.after_image.url }}" alt="Photo Après - {{ before_after.product.name }}" class="ba-image">
+            </div>
+        </div>
+    </div>
+
+    <!-- Colonne Droite : 2 Principes Actifs suivants -->
+    <div class="ba-col-right">
+        {% for ingredient in before_after.product.active_ingredients_list.all|slice:"2:4" %}
+            <div class="ba-info-group">
+                <h4 class="ba-subtitle">{{ ingredient.name }}</h4>
+                <p class="ba-text">{{ ingredient.repair_method }}</p>
+            </div>
+        
+        {% endfor %}
+    </div>
+</div>
+</section>
+{% endif %}
+
+<!-- 3. Catalogue Produits -->
+<section class="products-catalog-section">
+    <div class="catalog-container">
+        <h2 class="catalog-title">
+            Routine {% if current_usage %}{{ current_usage.name }}{% else %}Éclat{% endif %}
+        </h2>
+
+        <div class="product-grid">
+            {% for product in products %}
+                <div class="product-card">
+                    <a href="{% if product.slug %}{% url 'product_detail' slug=product.slug %}{% else %}#{% endif %}" class="product-image-link">
+                        {% if product.discount_price and product.discount_price < product.price %}
+                            <span class="product-badge-promo">PROMO</span>
+                        {% endif %}
+
+                        {% if product.main_image %}
+                            <img src="{{ product.main_image.url }}" alt="{{ product.name }}" class="product-image">
+                        {% else %}
+                            <img src="{% static 'images/placeholder.png' %}" alt="{{ product.name }}" class="product-image">
+                        {% endif %}
+                    </a>
+
+                    <div class="product-details">
+                        <div class="product-header-info">
+                            <h3 class="product-name">
+                                <a href="{% if product.slug %}{% url 'product_detail' slug=product.slug %}{% else %}#{% endif %}">
+                                    {{ product.name }}
+                                </a>
+                            </h3>
+
+                            <div class="product-price">
+                                — DA {{ product.get_final_price }} DZD
+                            </div>
+                        </div>
+
+                        <!-- Étoiles dynamiques -->
+                        <div class="product-rating">
+                            {% with rating=product.average_rating %}
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= rating %}
+                                        ★
+                                    {% else %}
+                                        ☆
+                                    {% endif %}
+                                {% endfor %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="empty-catalog">
+                    <p class="empty-catalog-text">Aucun produit disponible dans cette catégorie pour le moment.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+<style>
+/* --- VARIABLES & TYPOGRAPHY --- */
+:root {
+    --primary-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --text-color: #111111;
+    --muted-text: #666666;
+    --bg-gray: #e9e9e9;
+}
+
+body {
+    font-family: var(--primary-font);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* --- 1. HERO BANNER FIXE --- */
+.hero-banner {
+    position: sticky; /* ou position: fixed */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 80vh;
+    min-height: 500px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    z-index: 1; /* Reste en arrière-plan */
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    color: #ffffff;
+}
+
+.hero-title {
+    font-size: 4rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    margin: 0;
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* --- 2. BEFORE & AFTER SECTION --- */
+.before-after-section {
+    position: relative;
+    z-index: 2; /* Passe par-dessus le Hero Banner */
+    padding: 90px 20px;
+    text-align: center;
+    background-color: #ffffff; /* Fond opaque obligatoire pour masquer le Hero */
+}
+.before-after-header {
+    max-width: 850px;
+    margin: 0 auto 60px auto;
+}
+
+.before-after-title {
+    font-size: 2.5rem;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    margin-bottom: 20px;
+    color: #111111;
+}
+
+.before-after-desc {
+    color: var(--muted-text);
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin: 0 auto;
+    max-width: 800px;
+}
+
+/* Grille à 3 colonnes parfaitement équilibrée */
+.before-after-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr 1fr;
+    align-items: center;
+    gap: 40px;
+}
+
+.ba-col-left {
+    text-align: right;
+}
+
+.ba-col-right {
+    text-align: left;
+}
+
+.ba-info-group {
+    margin-bottom: 40px;
+}
+
+.ba-info-group:last-child {
+    margin-bottom: 0;
+}
+
+.ba-subtitle {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: #111111;
+}
+
+.ba-text {
+    font-size: 0.9rem;
+    color: #666666;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Visuel Avant / Après (Slider Style) */
+.ba-col-center {
+    width: 100%;
+}
+
+.ba-images-wrapper {
+    position: relative;
+    display: flex;
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.ba-image-container {
+    flex: 1;
+    position: relative;
+}
+
+.ba-image {
+    width: 100%;
+    height: 420px;
+    object-fit: cover;
+    display: block;
+}
+
+/* Ligne de séparation centrale avec icône < > */
+.ba-images-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    background-color: #ffffff;
+    z-index: 2;
+    transform: translateX(-50%);
+}
+
+.ba-images-wrapper::after {
+    content: '‹ ›';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 36px;
+    height: 36px;
+    background-color: #ffffff;
+    color: #111111;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 3;
+}
+
+/* --- 3. CATALOG SECTION --- */
+.products-catalog-section {
+    position: relative;
+    z-index: 2; /* Reste au même niveau pour continuer le défilement */
+    padding: 20px 40px 100px 40px;
+    background-color: #ffffff;
+}
+.catalog-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.catalog-title {
+    font-size: 2.6rem;
+    font-weight: 400;
+    margin-bottom: 40px;
+    color: #111111;
+    letter-spacing: -0.02em;
+}
+
+/* Grille à 2 colonnes comme sur les photos */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 50px 24px;
+}
+
+.product-card {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Fond gris et grande taille d'image */
+.product-image-link {
+    position: relative;
+    text-decoration: none;
+    display: flex;
+    background-color: var(--bg-gray);
+    border-radius: 8px;
+    height: 580px;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 40px;
+}
+
+.product-image {
+    max-height: 85%;
+    max-width: 85%;
+    object-fit: contain;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.product-image-link:hover .product-image {
+    transform: scale(1.03);
+}
+
+.product-badge-promo {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    background-color: #111111;
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    letter-spacing: 0.5px;
+    z-index: 2;
+}
+
+/* Infos produit sous l'image */
+.product-details {
+    padding-top: 14px;
+}
+
+.product-header-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 15px;
+}
+
+.product-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin: 0;
+    color: #111111;
+    letter-spacing: 0.6px;
+    line-height: 1.4;
+    flex: 1;
+}
+
+.product-name a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.product-price {
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: #111111;
+    white-space: nowrap;
+    letter-spacing: 0.3px;
+}
+
+.product-rating {
+    margin-top: 5px;
+    color: #111111;
+    font-size: 0.72rem;
+    letter-spacing: 1.5px;
+}
+
+/* --- RESPONSIVE MOBILE --- */
+@media (max-width: 900px) {
+    .before-after-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    
+    .ba-col-left, .ba-col-right {
+        text-align: center;
+    }
+
+    .product-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .product-image-link {
+        height: 400px;
+    }
+    
+    .hero-title {
+        font-size: 2.8rem;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,640 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}Optipharm - Laboratoire Dermo-Cosmétique{% endblock %}
+
+{% block content %}
+<!-- 1. Hero Section (Inspiré de Touche Lab) -->
+
+    
+<section class="video-hero-section">
+    <div class="video-container">
+        <video class="media-video" autoplay loop muted playsinline>
+            <source src="{% static 'videos/download.mp4' %}" type="video/mp4">
+            Votre navigateur me supporte pas la balise vidéo.
+        </video>
+    </div>
+</section>
+
+<section>...</section>
+<section class="filter-container">
+    {% for usage in usage_types %}
+        <a href="{% url 'catalog' usage_slug=usage.slug %}" class="filter-button">
+            {{ usage.name|upper }}
+        </a>
+    {% empty %}
+        <button class="filter-button" style="opacity: 0.5;" disabled>
+            AUCUN TYPE DISPONIBLE
+        </button>
+    {% endfor %}
+</section>
+
+
+
+
+{% load static %}
+
+<section class="essentiels-section">
+    <h1 class="section-title">LES ESSENTIELS</h1>
+    <p class="section-subtitle">L'excellence est notre norme</p>
+
+    <div class="carousel-container">
+        <button class="nav-button prev-button" aria-label="Produit précédent">&#10094;</button>
+        
+        <div class="product-carousel" id="productCarousel">
+
+            <!-- Carte spéciale fixe (Satisfaction) -->
+            
+
+<div class="product-card special-card">
+    <img src="{% static 'images/66.jpg' %}" alt="Clients satisfaits" class="special-bg-img">
+    <div class="special-content">
+        <h2 class="satisfaction-rate">98<sup>%</sup> clients</h2>
+        <p class="satisfaction-text">satisfaits</p>
+        
+    </div>
+</div>
+
+            <!-- Boucle dynamique sur vos produits -->
+            {% for product in essential_products %}
+            <div class="product-card product-item">
+                <a href="{% url 'product_detail' product.slug %}" style="text-decoration: none; color: inherit;">
+                    
+                    <div class="product-image-placeholder">
+    {% if product.main_image %}
+        <!-- Image principale (Default) -->
+        <img src="{{ product.main_image.url }}" alt="{{ product.name }} - Vue principale" class="product-img product-img-default">
+        
+        <!-- Image alternative au survol (Hover) -->
+        {% if product.hover_image %}
+            <img src="{{ product.hover_image.url }}" alt="{{ product.name }} - Vue alternative" class="product-img product-img-hover">
+        {% else %}
+            <!-- Si ma kanche hover_image, n-affichiw la même image -->
+            <img src="{{ product.main_image.url }}" alt="{{ product.name }} - Vue principale" class="product-img product-img-hover">
+        {% endif %}
+    {% else %}
+        <img src="{% static 'images/placeholder.png' %}" alt="{{ product.name }}" class="product-img product-img-default">
+        <img src="{% static 'images/placeholder.png' %}" alt="{{ product.name }}" class="product-img product-img-hover">
+    {% endif %}
+</div>
+                    
+                    <p class="product-name">{{ product.name }}</p>
+
+                    <!-- Affichage du Prix avec gestion Promo/Discount -->
+                    <p class="product-price">
+                        {% if product.discount_price and product.discount_price < product.price %}
+                            <span style="text-decoration: line-through; opacity: 0.6; font-size: 0.85em; margin-right: 5px;">
+                                DA {{ product.price|floatformat:2 }} DZD
+                            </span>
+                            <span style="color: var(--accent-color, #c59b27); font-weight: bold;">
+                                DA {{ product.discount_price|floatformat:2 }} DZD
+                            </span>
+                        {% else %}
+                            DA {{ product.price|floatformat:2 }} DZD
+                        {% endif %}
+                    </p>
+
+                </a>
+            </div>
+            {% empty %}
+            <div class="product-card product-item">
+                <p class="no-products" style="padding: 20px; text-align: center;">Aucun produit disponible.</p>
+            </div>
+            {% endfor %}
+
+        </div>
+
+        <button class="nav-button next-button" aria-label="Produit suivant">&#10095;</button>
+    </div>
+</section>
+<section class="valeurs-marque-section">
+    <div class="slogan-container">
+        <p class="slogan-petit">CHAQUE FORMULE COMMENCE PAR LA SCIENCE</p>
+        <h1 class="slogan-principal">
+            Nos produits <span class="gris"> incarnent l’alliance parfaite entre</span> la puissance bienfaisante de la nature et l’excellence scientifique <span class="gris">des laboratoires Optipharm</span>, pour offrir des soins à la fois efficaces, sûrs et innovants.
+        </h1>
+        <a href="{% url 'about' %}" class="btn-en-savoir-plus">EN SAVOIR PLUS</a>
+    </div>
+
+    <div class="icones-container">
+        <div class="icone-item">
+            <div class="icone-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L12 22M4 6V18C4 19.1046 4.89543 20 6 20H18C19.1046 20 20 19.1046 20 18V6C20 4.89543 19.1046 4 18 4H6C4.89543 4 4 4.89543 4 6Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 10H16M8 14H16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <p class="icone-texte">FORMULES<br>BREVETÉES</p>
+        </div>
+        
+        <div class="icone-item">
+            <div class="icone-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 21C15 16 20 12 20 8C20 4.68629 16.9208 2 12 2C7.0792 2 4 4.68629 4 8C4 12 9 16 12 21Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <p class="icone-texte">PRODUITS,<br>NON COMÉDOGÈNES</p>
+        </div>
+        
+        <div class="icone-item">
+            <div class="icone-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 10L10 14M10 10L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <p class="icone-texte">NATUREL<br>ET BIO</p>
+        </div>
+        
+        <div class="icone-item">
+            <div class="icone-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35L10.55 20.03C5.4 15.36 2 12.28 2 8.5C2 5.42 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.09C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.42 22 8.5C22 12.28 18.6 15.36 17.45 20.03L12 21.35Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 8C15 9.10457 14.1046 10 13 10C11.8954 10 11 9.10457 11 8C11 6.89543 11.8954 6 13 6C14.1046 6 15 6.89543 15 8Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <p class="icone-texte">CRUELTY<br>FREE</p>
+        </div>
+    </div>
+</section>
+
+<div class="header-section">
+    <h1>Ce sont nos clients qui en parlent le mieux.</h1>
+    <p>Vous aussi, partagez votre </p>
+</div>
+{% load static %}
+
+<section class="video-gallery count-{{ product_videos|length }}">
+    {% for video in product_videos %}
+        <div class="video-preview preview-{{ forloop.counter }}{% if product_videos|length >= 3 and forloop.counter == 3 %} main-preview{% endif %}{% if product_videos|length == 1 %} single-video{% endif %}">
+            
+            <!-- Lien vers la page du produit lié à la vidéo -->
+            <a href="#" class="video-link" title="{{ video.title }} - {{ video.product.name }}">
+                
+                <video autoplay muted loop playsinline {% if video.thumbnail %}poster="{{ video.thumbnail.url }}"{% endif %}>
+                    {% if video.video_file %}
+                        <source src="{{ video.video_file.url }}" type="video/mp4">
+                    {% else %}
+                        <source src="{{ video.video_url }}" type="video/mp4">
+                    {% endif %}
+                </video>
+
+                <!-- Overlay pour la 1ère et la 5ème vidéo si au moins 5 vidéos -->
+                {% if product_videos|length >= 5 and forloop.counter == 1 or forloop.counter == 5 %}
+                    <div class="overlay"></div> 
+                {% endif %}
+
+            </a>
+
+        </div>
+    {% empty %}
+        <!-- Cas où aucune vidéo n'est enregistrée dans la BDD -->
+        <div class="video-preview preview-1"><div class="overlay"></div></div>
+        <div class="video-preview preview-2"></div>
+        <div class="video-preview preview-3 main-preview"></div>
+        <div class="video-preview preview-4"></div>
+        <div class="video-preview preview-5"><div class="overlay"></div></div>
+    {% endfor %}
+</section>
+
+
+<section class="promo-section">
+    <div class="promo-header">
+        <h1>Réservé à nos clients</h1>
+        <p>Découvrez nos offres</p>
+    </div>
+
+    <div class="promo-container">
+
+        <!-- Cartes des produits en promotion (max 2) -->
+        {% for product in promo_products|slice:":2" %}
+        <div class="promo-card product-item {% if forloop.first %}first-product{% else %}second-product{% endif %}">
+            
+            <!-- Badge Économie dynamique -->
+            {% if product.discount_percentage > 0 %}
+                <div class="promo-badge">ÉCONOMISEZ {{ product.discount_percentage }}%</div>
+            {% endif %}
+
+            <!-- رابط يوجه إلى صفحة العروض الترويجية كاملة -->
+            <a href="{% url 'promo_products_list' %}" class="promo-card-link">
+                <div class="promo-image-box">
+                    
+                    <!-- Image principale (Default) -->
+                    {% if product.main_image %}
+                        <img src="{{ product.main_image.url }}" alt="{{ product.name }}" class="promo-visual default-visual">
+                    {% else %}
+                        <img src="{% static 'images/placeholder.png' %}" alt="{{ product.name }}" class="promo-visual default-visual">
+                    {% endif %}
+
+                    <!-- Image au survol (Hover Image) -->
+                    {% if product.hover_image %}
+                        <img src="{{ product.hover_image.url }}" alt="{{ product.name }} Hover" class="promo-visual hover-visual">
+                    {% elif product.main_image %}
+                        <img src="{{ product.main_image.url }}" alt="{{ product.name }} Hover" class="promo-visual hover-visual">
+                    {% else %}
+                        <img src="{% static 'images/placeholder.png' %}" alt="{{ product.name }}" class="promo-visual hover-visual">
+                    {% endif %}
+
+                </div>
+
+                <p class="promo-product-title">{{ product.name }}</p>
+
+                <!-- Prix promotionnel / Prix d'origine -->
+                <p class="promo-product-price">
+                    DA {{ product.discount_price|floatformat:2 }} DZD 
+                    <del>DA {{ product.price|floatformat:2 }} DZD</del>
+                </p>
+            </a>
+
+        </div>
+        {% empty %}
+            <div class="promo-card product-item first-product">
+                <p style="padding: 20px; text-align: center;">Aucune offre promotionnelle actuellement.</p>
+            </div>
+        {% endfor %}
+
+        <!-- Carte Bannière dynamique liée à SpecialOffer -->
+        
+            <!-- Bannière de secours statique si aucune offre n'est active -->
+           <div class="promo-card promo-banner-card" style="background-image: url('{% static 'images/66.jpg' %}'); background-size: cover; background-position: center;">
+    <a href="{% url 'promo_products_list' %}" class="promo-banner-link">
+        <div class="promo-banner-content">
+            <h1>Nos soins Visage</h1>
+            <p>HYDRATATION · RÉPARATION · UNIFICATION</p>
+        </div>
+    </a>
+</div>
+        
+
+    </div>
+</section>
+
+<style>
+/* ==========================================
+   SECTION PROMOTIONS (UNIQUE CLASS NAMES)
+   ========================================== */
+
+.promo-section {
+    padding: 60px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* En-tête de la section */
+.promo-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.promo-header h1 {
+    font-size: 2rem;
+    color: #222;
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+.promo-header p {
+    font-size: 1.1rem;
+    color: #666;
+}
+
+/* Conteneur principal (Grille de 3 cartes) */
+.promo-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    align-items: stretch;
+}
+
+/* Structure globale des cartes */
+.promo-card {
+    background-color: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.promo-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.promo-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* Badge Réduction */
+.promo-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background-color: #e53935;
+    color: #fff;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    border-radius: 4px;
+    z-index: 3;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Zone Image du Produit & Effet Hover */
+.promo-image-box {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background-color: #f8f8f8;
+    overflow: hidden;
+}
+
+.promo-visual {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: opacity 0.4s ease;
+}
+
+.promo-visual.default-visual {
+    opacity: 1;
+    z-index: 1;
+}
+
+.promo-visual.hover-visual {
+    opacity: 0;
+    z-index: 2;
+}
+
+/* Effet Hover : Masque la 1ère image et affiche la 2ème/vidéo */
+.product-item:hover .default-visual {
+    opacity: 0;
+}
+
+.product-item:hover .hover-visual {
+    opacity: 1;
+}
+
+/* Titre et Prix */
+.promo-product-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    margin: 15px 15px 8px 15px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.promo-product-price {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #e53935;
+    margin: 0 15px 20px 15px;
+    text-align: center;
+}
+
+.promo-product-price del {
+    font-size: 0.9rem;
+    color: #999;
+    margin-left: 8px;
+    font-weight: 400;
+}
+
+/* Carte Bannière (3ème Carte) */
+.promo-banner-card {
+    background-color: #111;
+    color: #fff;
+    min-height: 380px;
+    position: relative;
+}
+
+.promo-banner-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 1;
+}
+
+.promo-banner-link {
+    text-decoration: none;
+    color: inherit;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+}
+
+.promo-banner-content {
+    text-align: center;
+    padding: 30px 20px;
+}
+
+.promo-banner-content h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #fff;
+    text-transform: uppercase;
+}
+
+.promo-banner-content p {
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    color: #e0e0e0;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .promo-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .promo-banner-card {
+        grid-column: span 2;
+        min-height: 250px;
+    }
+}
+
+@media (max-width: 576px) {
+    .promo-container {
+        grid-template-columns: 1fr;
+    }
+
+    .promo-banner-card {
+        grid-column: span 1;
+    }
+}
+
+</style>
+
+
+
+
+
+
+
+
+<section class="diagnostic-section">
+    <div class="diagnostic-content">
+        <p class="subtitle">DÉCOUVREZ LA ROUTINE IDÉALE QUI VOUS CONVIENT.</p>
+        <h1 class="title">Diagnostic</h1>
+        <p class="description">
+            Grâce à ce diagnostic en ligne nous allons prendre en compte vos problématiques et
+            leurs causes pour vous proposer la meilleure façon de protéger et de préserver votre
+            peau.
+        </p>
+        <a href="{% url 'about' %}" class="btn-link">JE LE FAIS</a>
+    </div>
+
+    <div class="diagnostic-media">
+        <div class="media-overlay">
+            DÉCOUVRIR
+        </div>
+        <video class="media-video" autoplay loop muted playsinline>
+            <source src="{% static 'videos/download.mp4' %}" type="video/mp4">
+            Votre navigateur me supporte pas la balise vidéo.
+        </video>
+    </div>
+</section>
+
+
+
+
+
+<section class="follow-us-section">
+    <div class="header">
+        <h2>Suivez-nous</h2>
+        <p>@SARLOptipharm.lab</p>
+    </div>
+
+    <div class="gallery-grid">
+
+        <!-- Item 1 -->
+        {% with rev=review_images.0 %}
+        <div class="grid-item item-1">
+            {% if rev and rev.image %}
+                <img src="{{ rev.image.url }}" alt="{{ rev.comment|default:'Avis client' }}">
+                <div class="overlay">
+                    <a href="#" class="hover-link">Voir plus</a>
+                </div>
+            {% endif %}
+        </div>
+        {% endwith %}
+
+        <!-- Item 2 -->
+        {% with rev=review_images.1 %}
+        <div class="grid-item item-2">
+            {% if rev and rev.image %}
+                <img src="{{ rev.image.url }}" alt="{{ rev.comment|default:'Avis client' }}">
+                <div class="overlay">
+                    <a href="#" class="hover-link">Voir plus</a>
+                </div>
+            {% endif %}
+        </div>
+        {% endwith %}
+
+        <!-- Item 3 (main-image) -->
+        {% with rev=review_images.2 %}
+        <div class="grid-item item-3 main-image">
+            {% if rev and rev.image %}
+                <img src="{{ rev.image.url }}" alt="{{ rev.comment|default:'Avis client' }}">
+                <div class="overlay">
+                    <a href="#" class="hover-link">Voir plus</a>
+                </div>
+            {% endif %}
+        </div>
+        {% endwith %}
+
+        <!-- Item 4 -->
+        {% with rev=review_images.3 %}
+        <div class="grid-item item-4">
+            {% if rev and rev.image %}
+                <img src="{{ rev.image.url }}" alt="{{ rev.comment|default:'Avis client' }}">
+                <div class="overlay">
+                    <a href="#" class="hover-link">Voir plus</a>
+                </div>
+            {% endif %}
+        </div>
+        {% endwith %}
+
+        <!-- Item 5 avec Caption -->
+        {% with rev=review_images.4 %}
+        <div class="grid-item item-5">
+            {% if rev and rev.image %}
+                <img src="{{ rev.image.url }}" alt="{{ rev.comment|default:'Avis client' }}">
+                {% if rev.comment %}
+                    <div class="caption top-right">
+                        {{ rev.comment|truncatewords:4|upper }}
+                    </div>
+                {% endif %}
+                <div class="overlay">
+                    <a href="#" class="hover-link">Voir plus</a>
+                </div>
+            {% endif %}
+        </div>
+        {% endwith %}
+
+        <!-- Item 6 -->
+        {% with rev=review_images.5 %}
+        <div class="grid-item item-6">
+            {% if rev and rev.image %}
+                <img src="{{ rev.image.url }}" alt="{{ rev.comment|default:'Avis client' }}">
+                <div class="overlay">
+                    <a href="#" class="hover-link">Voir plus</a>
+                </div>
+            {% endif %}
+        </div>
+        {% endwith %}
+
+        <!-- Item 7 : Barre noire (inchangée) -->
+        <div class="grid-item item-7 black-bar">
+            <div class="inner-content"></div>
+        </div>
+
+        <!-- Item 8 -->
+        {% with rev=review_images.6 %}
+        <div class="grid-item item-8">
+            {% if rev and rev.image %}
+                <img src="{{ rev.image.url }}" alt="{{ rev.comment|default:'Avis client' }}">
+                <div class="overlay">
+                    <a href="#" class="hover-link">Voir plus</a>
+                </div>
+            {% endif %}
+        </div>
+        {% endwith %}
+
+        <!-- Item 9 avec Caption -->
+        {% with rev=review_images.7 %}
+        <div class="grid-item item-9">
+            {% if rev and rev.image %}
+                <img src="{{ rev.image.url }}" alt="{{ rev.comment|default:'Avis client' }}">
+                {% if rev.comment %}
+                    <div class="caption bottom-right">
+                        {{ rev.comment|truncatewords:5|upper }}
+                    </div>
+                {% endif %}
+                <div class="overlay">
+                    <a href="#" class="hover-link">Voir plus</a>
+                </div>
+            {% endif %}
+        </div>
+        {% endwith %}
+
+    </div>
+
+    <div class="more-link">
+        <a href="#">MORE</a>
+        <div class="underline"></div>
+    </div>
+</section>
+
+
+
+
+{% endblock %}

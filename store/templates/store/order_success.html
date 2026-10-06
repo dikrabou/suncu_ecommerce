@@ -1,0 +1,472 @@
+
+{% extends 'store/base.html' %}
+
+{% block content %}
+<div class="checkout-wrapper">
+    <!-- COLONNE GAUCHE -->
+    <div class="checkout-left">
+      <div class="header-status" style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
+        <div class="success-icon" style="width: 48px; height: 48px; border-radius: 50%; border: 2px solid #005bd3; color: #005bd3; display: flex; align-items: center; justify-content: center;">
+          <svg viewBox="0 0 24 24" width="26" height="26" stroke="currentColor" stroke-width="2.5" fill="none">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <div>
+          <span class="confirmation-number" style="color: #666; font-size: 14px;">
+            Confirmation n° {% if order.order_number %}{{ order.order_number }}{% else %}CE{{ order.id }}{% endif %}
+          </span>
+          <h1 style="font-size: 24px; font-weight: 600; margin-top: 2px;">Merci, {{ order.full_name }} !</h1>
+        </div>
+      </div>
+
+      <!-- Statut -->
+      <div class="section-block" style="background-color: #f7f7f7; padding: 20px; border-radius: 8px;">
+        <h3 style="font-size: 16px; margin-bottom: 6px;">Votre commande est maintenant confirmée</h3>
+        <p class="sub-text" style="color: #666; font-size: 14px; margin-bottom: 12px;">Paiement à la livraison</p>
+        <label class="checkbox-container">
+          <input type="checkbox" checked disabled>
+          <span>Envoyez-moi des nouvelles et des offres par e-mail</span>
+        </label>
+      </div>
+
+      <!-- Détails commande -->
+      <div class="section-block" style="border: 1px solid #e1e1e1; padding: 20px; border-radius: 8px; margin-top: 20px;">
+        <h3 style="font-size: 16px; margin-bottom: 15px;">Détails de la commande</h3>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <div>
+            <h4 style="font-size: 14px; margin-bottom: 5px;">Coordonnées</h4>
+            <p style="font-size: 14px; color: #555;">{{ order.phone }}</p>
+
+            <h4 style="font-size: 14px; margin-top: 15px; margin-bottom: 5px;">Adresse de livraison</h4>
+            <p style="font-size: 14px; color: #555; line-height: 1.4;">
+              {{ order.full_name }}<br>
+              {{ order.address }}<br>
+              {{ order.commune }}<br>
+              {{ order.wilaya }}<br>
+              Algérie<br>
+              {{ order.phone }}
+            </p>
+
+            <h4 style="font-size: 14px; margin-top: 15px; margin-bottom: 5px;">Mode d'expédition</h4>
+            <p style="font-size: 14px; color: #555;">
+              {% if order.shipping_cost > 0 %}
+                Livraison à Domicile / Bureau
+              {% else %}
+                Livraison Standard
+              {% endif %}
+            </p>
+          </div>
+
+          <div>
+            <h4 style="font-size: 14px; margin-bottom: 5px;">Moyen de paiement</h4>
+            <p style="font-size: 14px; color: #555;">
+              Paiement à la livraison · {{ order.total_amount|floatformat:2 }} DA DZD
+            </p>
+
+            <h4 style="font-size: 14px; margin-top: 15px; margin-bottom: 5px;">Adresse de facturation</h4>
+            <p style="font-size: 14px; color: #555; line-height: 1.4;">
+              {{ order.full_name }}<br>
+              {{ order.address }}<br>
+              {{ order.commune }}<br>
+              {{ order.wilaya }}<br>
+              Algérie<br>
+              {{ order.phone }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px;">
+        <p style="font-size: 14px;">Besoin d'aide ? <a href="#" style="color: #005bd3;">Nous contacter</a></p>
+        <a href="{% url 'home' %}" style="background-color: #005bd3; color: white; padding: 12px 22px; border-radius: 6px; text-decoration: none; font-weight: 500;">
+          Retour à la boutique
+        </a>
+      </div>
+    </div>
+
+    <!-- COLONNE DROITE (Articles) -->
+    <div class="checkout-right">
+      <div class="summary-container">
+        <div class="items-list">
+          {% for item in order.items.all %}
+          <div class="cart-item">
+            <div class="item-thumb">
+              {% if item.product.main_image %}
+                <img src="{{ item.product.main_image.url }}" alt="{{ item.product.name }}">
+              {% endif %}
+              <span class="item-badge">{{ item.quantity }}</span>
+            </div>
+            <div class="item-info">
+              <span class="item-name">{{ item.product.name }}</span>
+            </div>
+            <div class="item-price">
+              <!-- Prix total de la ligne (prix unitaire x quantité) -->
+              {% if item.get_total_item_price %}
+                {{ item.get_total_item_price|floatformat:2 }} DA
+              {% else %}
+                {{ item.price|floatformat:2 }} DA
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="pricing-summary" style="margin-top: 20px;">
+          <div class="price-row">
+            <span>Sous-total</span>
+            <span>{{ subtotal|floatformat:2 }} DA</span>
+          </div>
+          <div class="price-row">
+            <span>Expédition</span>
+            <span>
+              {% if order.shipping_cost == 0 %}
+                GRATUIT
+              {% else %}
+                {{ order.shipping_cost|floatformat:2 }} DA
+              {% endif %}
+            </span>
+          </div>
+          <div class="price-row total-row" style="margin-top: 15px; border-top: 1px solid #e1e1e1; padding-top: 15px;">
+            <span>Total</span>
+            <div class="total-amount">
+              <small>DZD</small>
+              <strong>{{ order.total_amount|floatformat:2 }} DA</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+    <style>
+   
+  /* --- REINITIALISATION ET BASE POUR CETTE PAGE --- */
+  .checkout-wrapper {
+    display: flex;
+    width: 100%;
+    max-width: 1150px;
+    margin: 0 auto;
+    min-height: 80vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #333333;
+    background-color: #ffffff;
+  }
+
+  /* --- COLONNE GAUCHE (CONFIRMATION & DETAILS) --- */
+  .checkout-left {
+    flex: 1.15;
+    padding: 40px 50px 40px 0;
+    background-color: #ffffff;
+  }
+
+  /* En-tête avec l'icône bleue */
+  .header-status {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .success-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 2px solid #005bd3;
+    color: #005bd3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .confirmation-number {
+    color: #666666;
+    font-size: 13.5px;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .header-status h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #111111;
+    margin: 0;
+  }
+
+  /* Blocs d'informations */
+  .section-block {
+    padding: 20px 24px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+
+  .bg-gray {
+    background-color: #f7f7f7;
+  }
+
+  .border-card {
+    border: 1px solid #e1e1e1;
+  }
+
+  .section-block h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #111111;
+    margin: 0 0 8px 0;
+  }
+
+  .sub-text {
+    color: #555555;
+    font-size: 13.5px;
+    margin-bottom: 14px;
+  }
+
+  /* Checkbox personnalisée */
+  .checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13.5px;
+    color: #333333;
+    cursor: pointer;
+  }
+
+  .checkbox-container input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+    accent-color: #005bd3;
+    cursor: pointer;
+  }
+
+  /* Grille des détails de livraison / facturation */
+  .details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 10px;
+  }
+
+  .details-grid h4 {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #111111;
+    margin: 16px 0 4px 0;
+  }
+
+  .details-grid h4:first-child {
+    margin-top: 0;
+  }
+
+  .details-grid p {
+    font-size: 13.5px;
+    color: #555555;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* Footer Actions */
+  .footer-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 35px;
+    font-size: 13.5px;
+  }
+
+  .footer-actions p {
+    margin: 0;
+  }
+
+  .footer-actions a {
+    color: #005bd3;
+    text-decoration: none;
+  }
+
+  .footer-actions a:hover {
+    text-decoration: underline;
+  }
+
+  .btn-primary {
+    background-color: #005bd3 !important;
+    color: #ffffff !important;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none !important;
+    display: inline-block;
+    transition: background-color 0.2s ease;
+    border: none;
+  }
+
+  .btn-primary:hover {
+    background-color: #004bb5 !important;
+  }
+
+  /* --- COLONNE DROITE (PANIER ET RECAPITULATIF) --- */
+  .checkout-right {
+    flex: 0.85;
+    background-color: #fafafa;
+    border-left: 1px solid #e1e1e1;
+    padding: 40px 0 40px 45px;
+  }
+
+  .summary-container {
+    max-width: 380px;
+  }
+
+  /* Liste des articles */
+  .items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e1e1e1;
+  }
+
+  .cart-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .item-thumb {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    border-radius: 8px;
+    border: 1px solid #e1e1e1;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .item-thumb img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 6px;
+  }
+
+  .item-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #000000;
+    color: #ffffff;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .item-info {
+    flex: 1;
+    margin-left: 16px;
+  }
+
+  .item-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #222222;
+  }
+
+  .item-price {
+    font-size: 14px;
+    font-weight: 500;
+    color: #111111;
+  }
+
+  /* Récapitulatif du Prix */
+  .pricing-summary {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .price-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13.5px;
+    color: #555555;
+  }
+
+  .total-row {
+    margin-top: 10px;
+    border-top: 1px solid #e1e1e1;
+    padding-top: 18px;
+    font-size: 16px;
+    color: #111111;
+    align-items: baseline;
+  }
+
+  .total-row > span {
+    font-weight: 600;
+  }
+
+  .total-amount {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+
+  .total-amount small {
+    font-size: 12px;
+    color: #777777;
+    font-weight: normal;
+  }
+
+  .total-amount strong {
+    font-size: 18px;
+    font-weight: 600;
+    color: #000000;
+  }
+
+  /* --- RESPONSIVE MOBILE --- */
+  @media (max-width: 850px) {
+    .checkout-wrapper {
+      flex-direction: column-reverse;
+      padding: 0 15px;
+    }
+
+    .checkout-left {
+      padding: 25px 0;
+    }
+
+    .checkout-right {
+      border-left: none;
+      border-bottom: 1px solid #e1e1e1;
+      padding: 25px 0;
+      background-color: transparent;
+    }
+
+    .summary-container {
+      max-width: 100%;
+    }
+
+    .details-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .footer-actions {
+      flex-direction: column-reverse;
+      gap: 16px;
+      align-items: stretch;
+      text-align: center;
+    }
+
+    .btn-primary {
+      text-align: center;
+    }
+  }
+
+  </style>
+{% endblock %}

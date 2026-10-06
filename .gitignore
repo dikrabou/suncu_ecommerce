@@ -1,0 +1,18 @@
+# Environnement virtuel
+venv/
+env/
+ENV/
+
+# Cache Python
+__pycache__/
+*.pyc
+
+# Base de données locale (si tu veux la recréer en ligne)
+db.sqlite3
+
+# Fichiers de configuration IDE
+.vscode/
+.idea/
+
+# Fichiers statiques collectés en local
+staticfiles/

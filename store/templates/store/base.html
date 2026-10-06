@@ -1,0 +1,944 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- FontAwesome & CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.2">
+
+    <style>
+        /* Overlay et Modale de Recherche */
+        .search-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: none;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 80px;
+            z-index: 1000;
+        }
+
+        .search-overlay.active {
+            display: flex;
+        }
+
+        .search-card {
+            background-color: #ffffff;
+            width: 90%;
+            max-width: 580px;
+            border-radius: 6px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            padding: 20px 25px;
+        }
+
+        .search-header {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #e5e5e5;
+            padding-bottom: 10px;
+        }
+
+        .search-header .search-icon {
+            font-size: 18px;
+            color: #777;
+            margin-right: 12px;
+        }
+
+        .search-header input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .search-header .close-btn {
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .search-body {
+            padding-top: 15px;
+        }
+
+        .section-title {
+            display: block;
+            font-size: 11px;
+            letter-spacing: 1px;
+            color: #999;
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        /* Tags dynamiques des UsageType */
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 14px;
+        }
+
+        .tag {
+            font-size: 13px;
+            color: #555;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .tag:hover {
+            color: #000;
+            text-decoration: underline;
+        }
+
+        /* Liste des produits trouvés */
+        .results-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .product-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #333;
+            transition: background 0.2s;
+        }
+
+        .product-item:hover {
+            background-color: #f8f8f8;
+        }
+
+        .product-item img {
+            width: 45px;
+            height: 45px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .product-item .product-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-item .product-title {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .product-item .product-price {
+            font-size: 12px;
+            color: #777;
+        }
+
+        .loading-text, .no-result {
+            font-size: 13px;
+            color: #777;
+        }
+
+        /* Overlay du panier */
+        .cart-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 1001;
+        }
+
+        .cart-overlay.active {
+            display: block;
+        }
+
+        /* Panier Coulissant (Drawer) */
+        .cart-drawer {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 100%;
+            max-width: 400px;
+            height: 100%;
+            background-color: #ffffff;
+            z-index: 1002;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            transition: right 0.3s ease-in-out;
+        }
+
+        .cart-drawer.active {
+            right: 0;
+        }
+
+        .cart-drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .cart-promo-banner {
+            background-color: #f4f4f4;
+            padding: 10px 15px;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .cart-drawer-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .cart-drawer-footer {
+            padding: 20px;
+            border-top: 1px solid #eee;
+            background-color: #fff;
+        }
+
+        .btn-checkout {
+            display: block;
+            width: 100%;
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+            padding: 14px 0;
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+   <body>
+    <div class="mobile-overlay" id="mobile-overlay"></div>
+
+    <div class="top-announcement-bar">
+        <div class="scrolling-content">
+            <p>L'innovation arrive bientôt. De nouveaux produits, conçus pour vous offrir le meilleur.</p>
+            <p>L'innovation arrive bientôt. De nouveaux produits, conçus pour vous offrir le meilleur.</p>
+            <p>L'innovation arrive bientôt. De nouveaux produits, conçus pour vous offrir le meilleur.</p>
+            <p>L'innovation arrive bientôt. De nouveaux produits, conçus pour vous offrir le meilleur.</p>
+            <p>L'innovation arrive bientôt. De nouveaux produits, conçus pour vous offrir le meilleur.</p>
+        </div>
+    </div>
+
+    <header class="main-header">
+        <div class="logo">
+            <a href="{% url 'home' %}">
+                <img src="{% static 'images/logo.png' %}" alt="OPTI-Cosmitique" class="site-logo">
+            </a>
+        </div>
+
+        <nav class="main-nav" id="mobile-menu">
+            
+            <a href="#" class="mobile-close-btn" id="close-menu"><i class="fas fa-times"></i></a>
+            <ul>
+                <li><a href="{% url 'home' %}">ACCUEIL</a></li>
+                <li><a href="{% url 'about' %}">À propos</a></li>
+                <li><a href="{% url 'contact' %}">CONTACT </a></li>
+            </ul>
+        </nav>
+
+        <div class="action-icons">
+            <a href="#" id="open-search-modal"><i class="fas fa-search"></i></a>
+            <a href="#"><i class="fas fa-user"></i></a>
+            <a href="#" class="mobile-menu-toggle-btn" id="open-menu"><i class="fas fa-bars"></i></a>
+            <a href="#" id="open-cart-btn"><i class="fas fa-shopping-bag"></i></a>
+        </div>
+
+        <!-- Modale de Recherche -->
+        <div id="search-modal" class="search-overlay">
+            <div class="search-card">
+                <div class="search-header">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="search-input" placeholder="Rechercher un produit..." autocomplete="off">
+                    <button id="close-search-modal" class="close-btn">&times;</button>
+                </div>
+
+                <div class="search-body">
+                    <div id="default-suggestions" class="suggestions-section">
+                        <span class="section-title">PARCOURIR LES CATÉGORIES</span>
+                        <div id="dynamic-tags-container" class="tags-container">
+                            <span class="loading-text">Chargement des catégories...</span>
+                        </div>
+                    </div>
+
+                    <div id="search-results" class="results-section" style="display: none;">
+                        <span class="section-title">RÉSULTATS DE RECHERCHE</span>
+                        <div id="results-list" class="results-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="touche-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <a href="#" class="brand-logo light">
+                    <span class="logo-text">OPTIPHARM</span>
+                    <span class="logo-sub">LABORATOIRE</span>
+                </a>
+                <p>La référence en dermo-cosmétique avancée. Formules haute tolérance scientifiquement éprouvées.</p>
+                <div class="footer-socials">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-tiktok"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-links-group">
+                <h4>Nos Gammes</h4>
+                <ul>
+                    <li><a href="#">Soins du Visage</a></li>
+                    <li><a href="#">Expertise Capillaire</a></li>
+                    <li><a href="#">Soins du Corps</a></li>
+                    <li><a href="#">Nouveautés</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-links-group">
+                <h4>Information</h4>
+                <ul>
+                    <li><a href="#">À Propos d'Optipharm</a></li>
+                    <li><a href="#">Engagements Scientifiques</a></li>
+                    <li><a href="#">Points de Vente</a></li>
+                    <li><a href="#">FAQ & Contact</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-newsletter">
+                <h4>Restez Informé(e)</h4>
+                <p>Recevez nos conseils dermatologiques et offres exclusives.</p>
+                <form class="newsletter-form" onsubmit="event.preventDefault();">
+                    <input type="email" placeholder="Votre adresse e-mail..." required>
+                    <button type="submit"><i class="fas fa-arrow-right"></i></button>
+                </form>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 Optipharm Laboratoire Dermo-Cosmétique. Tous droits réservés.</p>
+        </div>
+    </footer>
+ <style>/* Variables pour les couleurs (Noir, Blanc, Doré) */
+:root {
+    --footer-bg: #0b0b0b;          /* Noir profond */
+    --footer-text: #ffffff;        /* Blanc pur */
+    --footer-gray: #999999;        /* Gris élégant pour les descriptions */
+    --footer-gold: #c5a059;        /* Doré raffiné */
+    --footer-gold-hover: #dfbc77;  /* Doré clair au survol */
+    --footer-border: #222222;      /* Bordure subtile */
+}
+.logo img {
+    height: 40px; /* Ajustez selon la taille souhaitée */
+    width: auto;
+    display: block;
+    object-fit: contain;
+}
+
+/* Style Global du Footer */
+.touche-footer {
+    background-color: var(--footer-bg);
+    color: var(--footer-text);
+    font-family: inherit;
+    padding: 70px 20px 20px 20px;
+    border-top: 1px solid var(--footer-border);
+}
+
+/* Grille principale */
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 2fr;
+    gap: 40px;
+    padding-bottom: 50px;
+    border-bottom: 1px solid var(--footer-border);
+}
+
+@media (max-width: 900px) {
+    .footer-container {
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
+}
+
+@media (max-width: 600px) {
+    .footer-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Marque et Logo */
+.brand-logo {
+    display: inline-block;
+    text-decoration: none;
+    margin-bottom: 15px;
+}
+.brand-logo .logo-text {
+    display: block;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--footer-text);
+}
+.brand-logo .logo-sub {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--footer-gold);
+    margin-top: 2px;
+}
+
+.footer-brand p {
+    color: var(--footer-gray);
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+/* Réseaux sociaux */
+.footer-socials {
+    display: flex;
+    gap: 15px;
+}
+.footer-socials a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--footer-border);
+    border-radius: 50%;
+    color: var(--footer-text);
+    background: #111;
+    transition: all 0.3s ease;
+}
+.footer-socials a:hover {
+    background: var(--footer-gold);
+    border-color: var(--footer-gold);
+    color: #000;
+}
+
+/* Groupes de liens */
+.footer-links-group h4,
+.footer-newsletter h4 {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    color: var(--footer-text);
+    position: relative;
+}
+
+/* Petite touche dorée subtile sous les titres */
+.footer-links-group h4::after,
+.footer-newsletter h4::after {
+    content: '';
+    display: block;
+    width: 25px;
+    height: 2px;
+    background-color: var(--footer-gold);
+    margin-top: 8px;
+}
+
+.footer-links-group ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.footer-links-group ul li {
+    margin-bottom: 12px;
+}
+.footer-links-group ul li a {
+    color: var(--footer-gray);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s ease;
+}
+.footer-links-group ul li a:hover {
+    color: var(--footer-gold);
+    padding-left: 5px; /* Petit effet de glissement élégant */
+}
+
+/* Newsletter */
+.footer-newsletter p {
+    color: var(--footer-gray);
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.newsletter-form {
+    display: flex;
+    border: 1px solid var(--footer-border);
+    background: #141414;
+    border-radius: 4px;
+    overflow: hidden;
+    transition: border-color 0.3s;
+}
+.newsletter-form:focus-within {
+    border-color: var(--footer-gold);
+}
+.newsletter-form input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 12px 15px;
+    color: var(--footer-text);
+    font-size: 13px;
+    outline: none;
+}
+.newsletter-form input::placeholder {
+    color: #666;
+}
+.newsletter-form button {
+    background: var(--footer-gold);
+    border: none;
+    padding: 0 18px;
+    color: #000;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+.newsletter-form button:hover {
+    background: var(--footer-gold-hover);
+}
+
+/* Bas du footer (Copyright) */
+.footer-bottom {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-top: 25px;
+    text-align: center;
+}
+.footer-bottom p {
+    color: #666;
+    font-size: 12px;
+}</style>
+    <!-- COMPOSANTS MODAUX ET PANIER -->
+    <div class="cart-overlay" id="cartOverlay"></div>
+
+    <aside class="cart-drawer" id="cartDrawer">
+        <div class="cart-drawer-header">
+            <h3>Le panier (<span id="cartCountHeader">0 Objet</span>)</h3>
+            <button type="button" class="cart-close-btn" id="closeCart">&times;</button>
+        </div>
+
+        <div class="cart-promo-banner">
+            Toutes nos félicitations! Vos commandes sont éligibles à la livraison gratuite.
+        </div>
+
+        <div class="cart-drawer-items" id="cartItemsContainer">
+            <!-- Rempli dynamiquement via JS -->
+        </div>
+
+        <div class="cart-drawer-footer">
+            <div class="cart-extra-options">
+                <button type="button" class="accordion-btn">Ajouter des notes de commande <span>+</span></button>
+                <button type="button" class="accordion-btn">Est-ce un cadeau? <span>+</span></button>
+            </div>
+
+            <a href="/checkout/" class="btn-checkout">
+                COMMANDER · <span id="drawerTotalPrice">0.00</span> DZD
+            </a>
+            <p class="cart-tax-note">Expédition & taxes calculées à la caisse</p>
+        </div>
+    </aside>
+
+    <!-- JS GLOBAL ET ASYNCHRONE -->
+    <script>
+    // --- Utilitaires Globaux ---
+    function getCSRFToken() {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.startsWith('csrftoken=')) {
+                    cookieValue = decodeURIComponent(cookie.substring('csrftoken='.length));
+                    break;
+                }
+            }
+        }
+        if (!cookieValue) {
+            const meta = document.querySelector('meta[name="csrf-token"]');
+            if (meta) cookieValue = meta.getAttribute('content');
+        }
+        return cookieValue;
+    }
+
+window.loadCartData = function() {
+    const container = document.getElementById('cartItemsContainer');
+    const countHeader = document.getElementById('cartCountHeader');
+    const totalPriceEl = document.getElementById('drawerTotalPrice');
+
+    if (!container) return;
+
+    fetch('/api/cart/', {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json',
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erreur HTTP: ' + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Données reçues depuis l'API :", data); // Permet de vérifier dans la console F12
+
+        // Extraction sécurisée des données
+        const cartData = data.cart || data;
+        const items = cartData.items || [];
+
+        // 1. Mise à jour du nombre d'objets dans l'en-tête
+        if (countHeader) {
+            const count = cartData.total_count !== undefined ? cartData.total_count : items.length;
+            countHeader.textContent = `${count} Objet${count > 1 ? 's' : ''}`;
+        }
+
+        // 2. Si le panier est vide
+        if (!Array.isArray(items) || items.length === 0) {
+            container.innerHTML = '<p style="padding:30px; text-align:center; color:#666;">Votre panier est vide.</p>';
+            if (totalPriceEl) totalPriceEl.textContent = '0,00';
+            return;
+        }
+
+        // 3. Réinitialiser le conteneur du panier
+        container.innerHTML = '';
+
+        // 4. Parcourir les éléments de manière ultra-sécurisée
+        items.forEach((item, index) => {
+            try {
+                const itemId = item.id !== undefined ? item.id : (item.product_id || index);
+                const itemName = item.name || item.title || 'Produit';
+                
+                // Parsing sécurisé du prix
+                let itemPrice = 0;
+                if (typeof item.price === 'number') {
+                    itemPrice = item.price;
+                } else if (item.price) {
+                    itemPrice = parseFloat(item.price) || 0;
+                }
+
+                // Parsing sécurisé de la quantité
+                const itemQty = parseInt(item.quantity || 1) || 1;
+                
+                // Image sécurisée
+                const itemImg = item.image_url || '/static/images/default-product.png';
+
+                const itemHtml = `
+                    <div class="cart-item" style="display:flex; gap:12px; padding:12px 0; border-bottom:1px solid #eee; align-items:center;">
+                        <img src="${itemImg}" alt="${itemName}" style="width:55px; height:55px; object-fit:cover; border-radius:4px;" onerror="this.onerror=null; this.src='/static/images/default-product.png';">
+                        <div style="flex:1;">
+                            <h4 style="font-size:14px; margin:0 0 4px; color:#333;">${itemName}</h4>
+                            <p style="font-size:13px; color:#666; margin:0 0 6px;">${itemPrice.toFixed(2)} DZD</p>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <button type="button" onclick="changeQuantity('${itemId}', 'decrease')" style="border:1px solid #ccc; background:#fff; width:24px; height:24px; cursor:pointer;">-</button>
+                                <span style="font-size:13px; font-weight:600;">${itemQty}</span>
+                                <button type="button" onclick="changeQuantity('${itemId}', 'increase')" style="border:1px solid #ccc; background:#fff; width:24px; height:24px; cursor:pointer;">+</button>
+                            </div>
+                        </div>
+                        <button type="button" onclick="removeFromCart('${itemId}')" style="background:none; border:none; color:#999; cursor:pointer; font-size:18px;">&times;</button>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', itemHtml);
+            } catch (err) {
+                console.error("Erreur lors de l'affichage d'un produit :", item, err);
+            }
+        });
+
+        // 5. Mise à jour du sous-total au bas
+        if (totalPriceEl) {
+            let subtotal = 0;
+            if (typeof cartData.subtotal === 'number') {
+                subtotal = cartData.subtotal;
+            } else if (cartData.subtotal) {
+                subtotal = parseFloat(cartData.subtotal) || 0;
+            }
+            totalPriceEl.textContent = subtotal.toFixed(2);
+        }
+    })
+    .catch(error => {
+        console.error('Erreur globale lors du traitement du panier:', error);
+        container.innerHTML = `<p style="padding:20px; text-align:center; color:red;">Erreur de chargement du panier.</p>`;
+    });
+};
+
+    window.changeQuantity = function(productId, action) {
+        const formData = new FormData();
+        formData.append('action', action);
+
+        fetch(`/cart/update/${productId}/`, {
+            method: 'POST',
+            headers: { 
+                'X-CSRFToken': getCSRFToken(),
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                window.loadCartData();
+            }
+        })
+        .catch(err => console.error('Erreur changement quantité:', err));
+    };
+
+    window.removeFromCart = function(productId) {
+        fetch(`/cart/remove/${productId}/`, {
+            method: 'POST',
+            headers: { 
+                'X-CSRFToken': getCSRFToken(),
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                window.loadCartData();
+            }
+        })
+        .catch(err => console.error('Erreur suppression:', err));
+    };
+
+    // --- Initialisation au Chargement du DOM ---
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. Menu Mobile
+        const openMenuBtn = document.getElementById('open-menu');
+        const closeMenuBtn = document.getElementById('close-menu');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileOverlay = document.getElementById('mobile-overlay');
+
+        if (openMenuBtn && mobileMenu) {
+            openMenuBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                mobileMenu.classList.add('active');
+                if (mobileOverlay) mobileOverlay.classList.add('active');
+            });
+        }
+
+        if (closeMenuBtn && mobileMenu) {
+            closeMenuBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                mobileMenu.classList.remove('active');
+                if (mobileOverlay) mobileOverlay.classList.remove('active');
+            });
+        }
+
+        if (mobileOverlay) {
+            mobileOverlay.addEventListener('click', () => {
+                if (mobileMenu) mobileMenu.classList.remove('active');
+                mobileOverlay.classList.remove('active');
+            });
+        }
+
+        // 2. Modale de Recherche
+        const searchModal = document.getElementById('search-modal');
+        const openSearchBtn = document.getElementById('open-search-modal');
+        const closeSearchBtn = document.getElementById('close-search-modal');
+        const searchInput = document.getElementById('search-input');
+        const defaultSuggestions = document.getElementById('default-suggestions');
+        const tagsContainer = document.getElementById('dynamic-tags-container');
+        const searchResults = document.getElementById('search-results');
+        const resultsList = document.getElementById('results-list');
+        let debounceTimer;
+
+        function loadUsageTypes() {
+            fetch('/api/search/')
+                .then(response => response.json())
+                .then(data => {
+                    if (!tagsContainer) return;
+                    tagsContainer.innerHTML = '';
+                    if (!data.categories || data.categories.length === 0) {
+                        tagsContainer.innerHTML = '<span class="no-result">Aucune catégorie disponible</span>';
+                        return;
+                    }
+
+                    data.categories.forEach(cat => {
+                        const tag = document.createElement('span');
+                        tag.className = 'tag';
+                        tag.textContent = cat.name;
+                        tag.dataset.slug = cat.slug;
+
+                        tag.addEventListener('click', () => {
+                            if (searchInput) searchInput.value = cat.name;
+                            fetchSearchResults(cat.name);
+                        });
+
+                        tagsContainer.appendChild(tag);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erreur catégories:', error);
+                    if (tagsContainer) tagsContainer.innerHTML = '<span class="no-result">Erreur de chargement</span>';
+                });
+        }
+
+        function fetchSearchResults(query) {
+            if (!query.trim()) {
+                resetSearch();
+                return;
+            }
+
+            if (defaultSuggestions) defaultSuggestions.style.display = 'none';
+            if (searchResults) searchResults.style.display = 'block';
+            if (resultsList) resultsList.innerHTML = '<p class="loading-text">Recherche en cours...</p>';
+
+            fetch(`/api/search/?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    renderProducts(data.products);
+                })
+                .catch(error => {
+                    console.error('Erreur recherche:', error);
+                    if (resultsList) resultsList.innerHTML = '<p class="no-result">Erreur de recherche.</p>';
+                });
+        }
+
+        function renderProducts(products) {
+            if (!resultsList) return;
+            resultsList.innerHTML = '';
+            if (!products || products.length === 0) {
+                resultsList.innerHTML = '<p class="no-result">Aucun produit trouvé.</p>';
+                return;
+            }
+
+            products.forEach(prod => {
+                const itemHtml = `
+                    <a href="${prod.url}" class="product-item">
+                        <img src="${prod.image}" alt="${prod.name}">
+                        <div class="product-info">
+                            <span class="product-title">${prod.name}</span>
+                            ${prod.price ? `<span class="product-price">${prod.price}</span>` : ''}
+                        </div>
+                    </a>
+                `;
+                resultsList.insertAdjacentHTML('beforeend', itemHtml);
+            });
+        }
+
+        function resetSearch() {
+            if (defaultSuggestions) defaultSuggestions.style.display = 'block';
+            if (searchResults) searchResults.style.display = 'none';
+            if (resultsList) resultsList.innerHTML = '';
+        }
+
+        if (openSearchBtn && searchModal) {
+            openSearchBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                searchModal.classList.add('active');
+                if (searchInput) searchInput.focus();
+                loadUsageTypes();
+            });
+        }
+
+        if (closeSearchBtn && searchModal) {
+            closeSearchBtn.addEventListener('click', () => {
+                searchModal.classList.remove('active');
+                if (searchInput) searchInput.value = '';
+                resetSearch();
+            });
+        }
+
+        if (searchModal) {
+            searchModal.addEventListener('click', (e) => {
+                if (e.target === searchModal) {
+                    searchModal.classList.remove('active');
+                    if (searchInput) searchInput.value = '';
+                    resetSearch();
+                }
+            });
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(debounceTimer);
+                const query = e.target.value.trim();
+                debounceTimer = setTimeout(() => {
+                    fetchSearchResults(query);
+                }, 300);
+            });
+        }
+
+        // 3. Modale / Drawer du Panier
+        const openCartBtn = document.getElementById('open-cart-btn');
+        const closeCartBtn = document.getElementById('closeCart');
+        const cartDrawer = document.getElementById('cartDrawer');
+        const cartOverlay = document.getElementById('cartOverlay');
+
+        function openCart() {
+            if (cartDrawer && cartOverlay) {
+                cartDrawer.classList.add('active');
+                cartOverlay.classList.add('active');
+                window.loadCartData();
+            }
+        }
+
+        function closeCart() {
+            if (cartDrawer && cartOverlay) {
+                cartDrawer.classList.remove('active');
+                cartOverlay.classList.remove('active');
+            }
+        }
+
+        if (openCartBtn) {
+            openCartBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                openCart();
+            });
+        }
+
+        if (closeCartBtn) closeCartBtn.addEventListener('click', closeCart);
+        if (cartOverlay) cartOverlay.addEventListener('click', closeCart);
+
+        // Accordéons du panier
+        document.querySelectorAll('.accordion-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.classList.toggle('active');
+                const span = this.querySelector('span');
+                if (span) {
+                    span.textContent = this.classList.contains('active') ? '-' : '+';
+                }
+            });
+        });
+    });
+    </script>
+</body>
+</html>

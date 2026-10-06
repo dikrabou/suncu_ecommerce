@@ -1,0 +1,322 @@
+{% extends "store/base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="contact-hero-section" style="background-image: url('{% static "images/66.jpg" %}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+    <div class="hero-content">
+        <h1>Contact us</h1>
+        <div class="underline"></div>
+    </div>
+</section>
+<section class="contact-section">
+    <h1>Contactez-nous</h1>
+
+    <!-- Affichage des messages de succès/erreur -->
+    {% if messages %}
+        <ul class="messages" style="list-style: none; padding: 0; color: green; margin-bottom: 20px;">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <form class="contact-form" method="POST">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            {{ form.full_name }}
+            {{ form.full_name.errors }}
+        </div>
+
+        <div class="form-group">
+            {{ form.email }}
+            {{ form.email.errors }}
+        </div>
+
+        <!-- Nouveau champ téléphone -->
+        <div class="form-group">
+            {{ form.phone }}
+            {{ form.phone.errors }}
+        </div>
+
+        <div class="form-group">
+            {{ form.message }}
+            {{ form.message.errors }}
+        </div>
+
+        <button type="submit" class="submit-button">ENVOYER</button>
+    </form>
+</section>
+
+<style>
+/* Vos styles d'origine conservés */
+.contact-section {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+    font-family: sans-serif;
+}
+
+.contact-section h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 40px;
+    color: black;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+/* Styles pour les champs texte, email et téléphone */
+.contact-form input[type="text"],
+.contact-form input[type="email"],
+.contact-form input[id="phone"] {
+    width: 100%;
+    padding: 15px 20px;
+    font-size: 1rem;
+    border: 1px solid black;
+    border-radius: 30px;
+    box-sizing: border-box;
+    outline: none;
+    color: black;
+    opacity: 1; 
+}
+
+.contact-form textarea {
+    width: 100%;
+    padding: 20px;
+    font-size: 1rem;
+    border: 1px solid black;
+    border-radius: 20px;
+    box-sizing: border-box;
+    height: 250px;
+    resize: none;
+    outline: none;
+    color: black;
+    opacity: 1;
+}
+
+.submit-button {
+    width: 150px;
+    padding: 15px 0;
+    margin-top: 15px;
+    background-color: black;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+</style>
+
+<section class="faq-section">
+    <h1 class="faq-title">Questions fréquentes</h1>
+    
+    <div class="faq-grid">
+        <div class="faq-item">
+            <button class="faq-question">
+                Combien de temps faut-il pour recevoir mes produits ?
+                <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+                <p>La réponse détaillée à la question sur le temps de livraison sera affichée ici.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">
+                Politique de remboursement
+                <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+                <p>La réponse détaillée concernant la politique de remboursement sera affichée ici.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">
+                Offrez-vous une garantie pour vos produits ?
+                <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+                <p>La réponse détaillée sur la garantie des produits sera affichée ici.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">
+                Quels modes d'livraison proposez-vous ?
+                <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+                <p>La réponse détaillée sur les méthodes d'expédition disponibles sera affichée ici.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section class="follow-us-section">
+    <div class="header">
+        <h2>Follow us</h2>
+        <p>@SARLOptipharm.lab</p>
+    </div>
+
+    <div class="gallery-grid">
+
+        <!-- Item 1 -->
+        {% with rev=review_images.0 %}
+        <div class="grid-item item-1">
+            {% if rev and rev.image %}
+                <img src="{{ rev.image.url }}" alt="{{ rev.comment|default:'Avis client' }}">
+                <div class="overlay">
+                    <a href="#" class="hover-link">MORE</a>
+                </div>
+            {% endif %}
+        </div>
+        {% endwith %}
+
+        <!-- Item 2 -->
+        {% with rev=review_images.1 %}
+        <div class="grid-item item-2">
+            {% if rev and rev.image %}
+                <img src="{{ rev.image.url }}" alt="{{ rev.comment|default:'Avis client' }}">
+                <div class="overlay">
+                    <a href="#" class="hover-link">MORE</a>
+                </div>
+            {% endif %}
+        </div>
+        {% endwith %}
+
+        <!-- Item 3 (main-image) -->
+        {% with rev=review_images.2 %}
+        <div class="grid-item item-3 main-image">
+            {% if rev and rev.image %}
+                <img src="{{ rev.image.url }}" alt="{{ rev.comment|default:'Avis client' }}">
+                <div class="overlay">
+                    <a href="#" class="hover-link">MORE</a>
+                </div>
+            {% endif %}
+        </div>
+        {% endwith %}
+
+        <!-- Item 4 -->
+        {% with rev=review_images.3 %}
+        <div class="grid-item item-4">
+            {% if rev and rev.image %}
+                <img src="{{ rev.image.url }}" alt="{{ rev.comment|default:'Avis client' }}">
+                <div class="overlay">
+                    <a href="#" class="hover-link">MORE</a>
+                </div>
+            {% endif %}
+        </div>
+        {% endwith %}
+
+        <!-- Item 5 avec Caption -->
+        {% with rev=review_images.4 %}
+        <div class="grid-item item-5">
+            {% if rev and rev.image %}
+                <img src="{{ rev.image.url }}" alt="{{ rev.comment|default:'Avis client' }}">
+                {% if rev.comment %}
+                    <div class="caption top-right">
+                        {{ rev.comment|truncatewords:4|upper }}
+                    </div>
+                {% endif %}
+                <div class="overlay">
+                    <a href="#" class="hover-link">MORE</a>
+                </div>
+            {% endif %}
+        </div>
+        {% endwith %}
+
+        <!-- Item 6 -->
+        {% with rev=review_images.5 %}
+        <div class="grid-item item-6">
+            {% if rev and rev.image %}
+                <img src="{{ rev.image.url }}" alt="{{ rev.comment|default:'Avis client' }}">
+                <div class="overlay">
+                    <a href="#" class="hover-link">MORE</a>
+                </div>
+            {% endif %}
+        </div>
+        {% endwith %}
+
+        <!-- Item 7 : Barre noire (inchangée) -->
+        <div class="grid-item item-7 black-bar">
+            <div class="inner-content"></div>
+        </div>
+
+        <!-- Item 8 -->
+        {% with rev=review_images.6 %}
+        <div class="grid-item item-8">
+            {% if rev and rev.image %}
+                <img src="{{ rev.image.url }}" alt="{{ rev.comment|default:'Avis client' }}">
+                <div class="overlay">
+                    <a href="#" class="hover-link">MORE</a>
+                </div>
+            {% endif %}
+        </div>
+        {% endwith %}
+
+        <!-- Item 9 avec Caption -->
+        {% with rev=review_images.7 %}
+        <div class="grid-item item-9">
+            {% if rev and rev.image %}
+                <img src="{{ rev.image.url }}" alt="{{ rev.comment|default:'Avis client' }}">
+                {% if rev.comment %}
+                    <div class="caption bottom-right">
+                        {{ rev.comment|truncatewords:5|upper }}
+                    </div>
+                {% endif %}
+                <div class="overlay">
+                    <a href="#" class="hover-link">MORE</a>
+                </div>
+            {% endif %}
+        </div>
+        {% endwith %}
+
+    </div>
+
+    <div class="more-link">
+        <a href="#">MORE</a>
+        <div class="underline"></div>
+    </div>
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+    document.querySelectorAll('.faq-question').forEach(button => {
+        button.addEventListener('click', () => {
+            const item = button.closest('.faq-item');
+            item.classList.toggle('active');
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}Nos Produits - Optipharm{% endblock %}
+
+{% block content %}
+<section class="products-section">
+    <h1>Nos Produits</h1>
+
+    <!-- شبكة عرض المنتجات -->
+    <div class="product-grid">
+        {% for product in products %}
+            <div class="product-card">
+                
+                <!-- صورة المنتج -->
+                <div class="product-image">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                    {% else %}
+                        <img src="{% static 'images/default-product.png' %}" alt="{{ product.name }}">
+                    {% endif %}
+                    
+                    <!-- شارة تصنيف المنتج (دواء أو مكمل) -->
+                    <span class="badge">
+                        {% if product.is_medicament %}Médicament{% else %}Complément{% endif %}
+                    </span>
+                </div>
+
+                <!-- تفاصيل المنتج -->
+                <div class="product-details">
+                    <h3>{{ product.name }}</h3>
+                    <p>{{ product.description|truncatewords:10 }}</p>
+                    
+                    <!-- رابط صفحة التفاصيل -->
+                    <!-- ✅ صحيح مع app_name -->
+<a href="{% url 'store:product_detail' product.id %}">Detail</a>
+                </div>
+
+            </div>
+        {% empty %}
+            <p>Aucun produit disponible pour le moment.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

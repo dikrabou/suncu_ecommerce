@@ -1,0 +1,212 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}Nos Offres Promotionnelles{% endblock %}
+
+{% block content %}
+<style>
+    .promo-page-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .promo-page-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .promo-page-header h1 {
+        font-size: 2.2rem;
+        color: #222;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+
+    .promo-page-header p {
+        color: #666;
+        font-size: 1.1rem;
+    }
+
+    .promo-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 25px;
+    }
+
+    /* Reuse du style des cartes */
+    .promo-card {
+        background-color: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .promo-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+
+    .promo-card-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+    .promo-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background-color: #e53935;
+        color: #fff;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        border-radius: 4px;
+        z-index: 3;
+        text-transform: uppercase;
+    }
+
+    .promo-image-box {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        background-color: #f8f8f8;
+        overflow: hidden;
+    }
+
+    .promo-visual {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+        top: 0;
+        left: 0;
+        transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .default-visual { opacity: 1; z-index: 1; }
+    .hover-visual { opacity: 0; z-index: 2; }
+
+    .promo-card:hover .default-visual { opacity: 0; }
+    .promo-card:hover .hover-visual { opacity: 1; transform: scale(1.05); }
+
+    .promo-product-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #333;
+        margin: 15px 15px 8px;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .promo-product-price {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #e53935;
+        margin: 0 15px 20px;
+        text-align: center;
+    }
+
+    .promo-product-price del {
+        font-size: 0.9rem;
+        color: #999;
+        margin-left: 8px;
+        font-weight: 400;
+    }
+
+    /* Pagination */
+    .pagination-container {
+        margin-top: 50px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .pagination-container a, .pagination-container span {
+        padding: 8px 16px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        text-decoration: none;
+        color: #333;
+    }
+
+    .pagination-container .active {
+        background-color: #e53935;
+        color: #fff;
+        border-color: #e53935;
+    }
+</style>
+
+<div class="promo-page-container">
+    <div class="promo-page-header">
+        <h1>Nos Offres Promotionnelles</h1>
+        <p>Découvrez tous nos produits actuellement en réduction ({{ total_count }})</p>
+    </div>
+
+    <div class="promo-grid">
+        {% for product in promo_products %}
+        <div class="promo-card">
+            
+            {% if product.discount_percentage > 0 %}
+                <div class="promo-badge">ÉCONOMISEZ {{ product.discount_percentage }}%</div>
+            {% endif %}
+
+            <a href="{{ product.get_absolute_url }}" class="promo-card-link">
+                <div class="promo-image-box">
+                    {% if product.main_image %}
+                        <img src="{{ product.main_image.url }}" alt="{{ product.name }}" class="promo-visual default-visual">
+                    {% else %}
+                        <img src="{% static 'images/placeholder.png' %}" alt="{{ product.name }}" class="promo-visual default-visual">
+                    {% endif %}
+
+                    {% if product.hover_image %}
+                        <img src="{{ product.hover_image.url }}" alt="{{ product.name }} Hover" class="promo-visual hover-visual">
+                    {% elif product.main_image %}
+                        <img src="{{ product.main_image.url }}" alt="{{ product.name }} Hover" class="promo-visual hover-visual">
+                    {% else %}
+                        <img src="{% static 'images/placeholder.png' %}" alt="{{ product.name }}" class="promo-visual hover-visual">
+                    {% endif %}
+                </div>
+
+                <p class="promo-product-title">{{ product.name }}</p>
+
+                <p class="promo-product-price">
+                    DA {{ product.discount_price|floatformat:2 }} DZD 
+                    <del>DA {{ product.price|floatformat:2 }} DZD</del>
+                </p>
+            </a>
+        </div>
+        {% empty %}
+            <p style="grid-column: 1 / -1; text-align: center; padding: 40px; font-size: 1.2rem; color: #888;">
+                Aucun produit en promotion pour le moment.
+            </p>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination Controls -->
+    {% if promo_products.has_other_pages %}
+    <div class="pagination-container">
+        {% if promo_products.has_previous %}
+            <a href="?page={{ promo_products.previous_page_number }}">&laquo; Précédent</a>
+        {% endif %}
+
+        {% for num in promo_products.paginator.page_range %}
+            {% if promo_products.number == num %}
+                <span class="active">{{ num }}</span>
+            {% else %}
+                <a href="?page={{ num }}">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if promo_products.has_next %}
+            <a href="?page={{ promo_products.next_page_number }}">Suivant &raquo;</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

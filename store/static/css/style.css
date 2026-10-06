@@ -1,0 +1,2771 @@
+  
+/* ---------------------------------- */
+/* 0. Règles de BASE */
+/* ---------------------------------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #1a1a1a;
+    background-color: #ffffff;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul {
+    list-style: none;
+}
+
+/* ---------------------------------- */
+/* 1. BANDEAU D'ANNONCE */
+/* ---------------------------------- */
+.top-announcement-bar {
+    background-color: #ffffff;
+    padding: 8px 0;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    overflow: hidden; 
+    width: 100%;
+}
+
+.scrolling-content {
+    display: flex; 
+    width: max-content;
+    animation: defilement 30s linear infinite; 
+}
+
+.scrolling-content p {
+    white-space: nowrap; 
+    margin: 0 40px; 
+    opacity: 0.8;
+}
+
+@keyframes defilement {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); } 
+}
+
+/* ---------------------------------- */
+/* 2. BARRE DE NAVIGATION (HEADER) */
+/* ---------------------------------- */
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    border-bottom: 1px solid #eee;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: 600;
+    text-transform: lowercase;
+    flex-basis: 20%;
+}
+
+.main-nav {
+    flex-grow: 1;
+    text-align: center;
+}
+
+.main-nav ul {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+}
+
+.main-nav a {
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: uppercase;
+    padding: 5px 0;
+    transition: color 0.3s;
+}
+
+.main-nav a:hover {
+    color: #555;
+}
+
+.dropdown i {
+    font-size: 8px;
+    margin-left: 5px;
+    position: relative;
+    top: -1px;
+    transition: transform 0.3s ease-in-out; 
+}
+
+.action-icons {
+    display: flex;
+    gap: 20px;
+    font-size: 18px;
+    flex-basis: 20%;
+    justify-content: flex-end;
+}
+
+/* Masquer les boutons hamburger/fermeture par défaut sur desktop */
+.mobile-menu-toggle-btn, .mobile-close-btn {
+    display: none;
+}
+
+
+/* ---------------------------------- */
+/* 3. SECTION HÉRO */
+/* ---------------------------------- */
+.hero-section {
+    width: 100%;
+    height: calc(100vh - 40px - 70px); 
+    min-height: 500px;
+    overflow: hidden;
+}
+
+.product-image-placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: #f0f0f0; 
+    background-size: cover;
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    filter: brightness(1.05) contrast(1.05);
+}
+
+/* ---------------------------------- */
+/* 4. Règles du MEGA MENU (Desktop) */
+/* ---------------------------------- */
+.main-nav ul li.dropdown {
+    position: relative;
+}
+
+.mega-menu {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 900px; 
+    background-color: #ffffff;
+    border: 1px solid #eeeeee;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    z-index: 100;
+    padding: 30px;
+    top: 100%;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Afficher au survol */
+.main-nav ul li.dropdown:hover .mega-menu {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+}
+
+.mega-menu-content {
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+.mega-menu-column {
+    flex: 1;
+    min-width: 180px;
+}
+
+.mega-menu-column h4 {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+    color: #333;
+    border-bottom: 1px solid #f5f5f5;
+    padding-bottom: 5px;
+}
+
+.mega-menu-column ul {
+    display: block;
+}
+
+.mega-menu-column li {
+    margin-bottom: 8px;
+}
+
+.mega-menu-column a {
+    display: block;
+    font-size: 13px;
+    font-weight: 400;
+    text-transform: none;
+    padding: 3px 0;
+    color: #666;
+}
+
+.mega-menu-highlight {
+    flex: 1.5;
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+/* ---------------------------------- */
+/* 5. RESPONSIVE (Adaptation Mobile) - MÉTHODE MENU LATÉRAL */
+/* ---------------------------------- */
+
+/* Fond transparent qui recouvre tout l'écran lorsque le menu est ouvert */
+.mobile-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Ombre noire semi-transparente */
+    z-index: 190; /* Doit être sous le menu (200) */
+    transition: opacity 0.3s ease-in-out;
+    opacity: 0;
+}
+
+.mobile-overlay.is-open {
+    display: block;
+    opacity: 1;
+}
+
+@media (max-width: 1024px) {
+    .main-nav ul {
+        gap: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Styles pour le Menu Latéral (Side Nav) */
+    .main-header {
+        padding: 15px 20px;
+    }
+    
+    .mobile-menu-toggle-btn {
+        display: block; 
+    }
+    
+    .main-nav {
+        position: fixed;
+        top: 0;
+        /* Position initiale: complètement à droite, hors de l'écran */
+        right: -300px; 
+        width: 280px; /* Largeur du menu latéral */
+        height: 100vh; 
+        background-color: #ffffff;
+        z-index: 200;
+        /* Remplacement d'opacity/visibility par right pour l'animation de glissement */
+        opacity: 1; 
+        visibility: visible;
+        pointer-events: all;
+        transition: right 0.3s ease-in-out; /* Animation de glissement */
+        padding: 20px; 
+        flex-grow: 0; 
+        text-align: left;
+        overflow-y: auto; 
+        box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .main-nav.is-open {
+        /* Position finale: glissé dans l'écran */
+        right: 0;
+    }
+    
+    .mobile-close-btn {
+        display: block;
+        position: absolute; /* Position absolue par rapport au .main-nav */
+        top: 20px;
+        left: 20px; /* Positionné en haut à gauche du menu latéral */
+        font-size: 24px;
+        z-index: 201; 
+    }
+
+    .main-nav ul {
+        gap: 0; 
+        flex-direction: column; 
+        align-items: flex-start; 
+        padding-top: 70px; /* Laisser de l'espace pour le bouton de fermeture */
+    }
+    
+    .main-nav ul li {
+        width: 100%; 
+        border-bottom: 1px solid #f5f5f5;
+        position: static; 
+    }
+
+    /* Le lien du niveau principal (ex: VISAGE) */
+    .main-nav ul li a {
+        padding: 15px 0; 
+        display: flex; 
+        justify-content: space-between;
+        align-items: center;
+        text-transform: uppercase;
+    }
+    
+    /* RÈGLES DE L'ACCORDÉON MOBILE (inchangées) */
+    
+    .mega-menu {
+        position: static; 
+        width: 100%;
+        border: none;
+        box-shadow: none;
+        padding: 0; 
+        opacity: 1; 
+        visibility: visible;
+        pointer-events: auto;
+        
+        /* Propriétés de l'accordéon (début caché) */
+        max-height: 0; 
+        overflow: hidden; 
+        transition: max-height 0.3s ease-out;
+        padding-left: 20px; 
+        padding-right: 20px;
+    }
+
+    .mega-dropdown.is-active .mega-menu {
+        max-height: 1000px; 
+        padding-bottom: 15px;
+    }
+
+    .mega-dropdown.is-active > a .fa-chevron-down {
+        transform: rotate(180deg);
+    }
+    
+    .mega-menu-content {
+        flex-direction: column;
+        gap: 0;
+        padding-top: 0;
+        border-top: none; 
+        padding-left: 0; 
+    }
+    
+    .mega-menu-column {
+        padding-top: 10px;
+        width: 100%; 
+    }
+
+    .mega-menu-column h4 {
+        margin-top: 5px;
+        font-size: 13px;
+        color: #1a1a1a; 
+        border-bottom: 1px solid #f5f5f5;
+        padding-bottom: 5px;
+    }
+    
+    .mega-menu-column a {
+        padding: 8px 0;
+        font-size: 13px;
+        color: #1a1a1a; 
+    }
+    
+    .mega-menu-column.mega-menu-highlight {
+        display: none; 
+    }
+}
+
+@media (max-width: 480px) {
+    .top-announcement-bar {
+        display: none; 
+    }
+    
+    .hero-section {
+        height: calc(100vh - 70px); 
+    }
+    
+    .main-header {
+        padding: 10px 15px;
+    }
+    
+    .logo {
+        font-size: 20px;
+    }
+}
+   
+/* ---------------------------------- */
+/* 3. SECTION VIDÉO HÉRO */
+/* ---------------------------------- */
+
+.video-hero-section {
+    position: relative;
+    width: 100%;
+    /* Hauteur basée sur le calcul précédent (ajustez si besoin) */
+    height: calc(100vh - 100px); 
+    min-height: 500px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    /* Optionnel : pour garantir que le texte reste visible si la vidéo est sombre */
+    color: #ffffff; 
+}
+
+.video-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1; /* Place la vidéo derrière le contenu */
+}
+
+.video-container video {
+    /* Propriété essentielle pour que la vidéo couvre tout l'espace */
+    object-fit: cover; 
+    width: 100%;
+    height: 100%;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2; /* Assure que le contenu est au-dessus de la vidéo */
+    padding: 20px;
+    /* Légère ombre de texte pour améliorer la lisibilité sur la vidéo */
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7); 
+}
+
+.hero-content h1 {
+    font-size: 3.5rem; /* Grande taille de titre */
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.hero-content p {
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+    font-weight: 300;
+}
+
+.cta-button {
+    display: inline-block;
+    background-color: #ffffff; /* Bouton blanc pour contraster */
+    color: #1a1a1a;
+    padding: 12px 25px;
+    border-radius: 3px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.cta-button:hover {
+    background-color: #eee;
+}
+/* ---------------------------------- */
+/* 4. SECTION FILTRES / BOUTONS DE PRÉOCCUPATION */
+/* ---------------------------------- */
+
+.concerns-filter-section {
+    padding: 50px 20px;
+    width: 100%;
+    /* Optionnel: Si vous voulez un fond légèrement différent */
+    /* background-color: #f9f9f9; */
+    overflow-x: auto; /* Permet le défilement horizontal si les boutons sont trop nombreux */
+    -webkit-overflow-scrolling: touch; /* Améliore le défilement sur iOS */
+}
+
+.filter-container {
+    display: flex;
+    gap: 15px; /* Espace entre les boutons */
+    justify-content: center; /* Centre les boutons sur les grands écrans */
+    
+    /* Permet aux boutons de ne pas s'enrouler si l'écran est trop petit (pour le défilement horizontal) */
+    white-space: nowrap; 
+    
+    /* Centre le contenu si le conteneur est plus petit que la fenêtre */
+    margin: 0 auto; 
+    max-width: 1200px; /* Limite la largeur maximale sur desktop */
+}
+
+.filter-button {
+    display: inline-flex; /* Utilisez flexbox pour centrer le texte dans le bouton */
+    align-items: center;
+    justify-content: center;
+    
+    /* Reproduction du style de l'image */
+    background-color: #ffffff;
+    color: #1a1a1a;
+    border: 1px solid #1a1a1a; /* Bordure fine et noire */
+    border-radius: 8px; /* Coins arrondis, ajustez cette valeur si nécessaire */
+    
+    padding: 12px 25px; /* Espacement intérieur du bouton */
+    
+    /* Style du texte */
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    
+    /* Optionnel : transition pour l'effet de survol */
+    transition: all 0.2s ease;
+}
+
+.filter-button:hover {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+/* ---------------------------------- */
+/* Responsive : Rendre les boutons empilables si l'espace est très limité (optionnel) */
+/* ---------------------------------- */
+@media (max-width: 600px) {
+    .filter-container {
+        /* On retire white-space: nowrap pour permettre aux boutons de s'enrouler */
+        white-space: normal; 
+        flex-wrap: wrap; /* Les éléments vont à la ligne */
+    }
+    
+    .filter-button {
+        /* Permet au bouton de prendre la moitié de l'écran ou la pleine largeur selon la taille */
+        flex: 1 1 calc(50% - 15px); 
+        min-width: 150px;
+        margin-bottom: 10px; /* Marge pour l'espace vertical entre les lignes */
+    }
+}
+
+
+
+
+/* Section des card des produit  */
+.essentiels-section {
+    text-align: center !important;
+    max-width: 1500px !important;
+    margin: 0 auto !important;
+    padding: 20px !important;
+    margin-bottom: 80px;
+}
+
+.section-title {
+    font-size: 3em !important;
+    font-weight: 900 !important;
+    letter-spacing: 5px !important;
+    margin-bottom: 10px !important;
+    color: #000 !important;
+}
+
+.section-subtitle {
+    font-size: 1em !important;
+    font-weight: 400 !important;
+    margin-bottom: 40px !important;
+    color: #666 !important;
+}
+
+/* Carousel Container and Navigation */
+.carousel-container {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 40px !important;
+}
+
+.product-carousel {
+    display: flex !important;
+    gap: 20px !important;
+    overflow-x: scroll !important;
+    scroll-snap-type: x mandatory !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding-bottom: 20px !important;
+    scrollbar-width: none !important;
+}
+
+/* Masquer la scrollbar pour Chrome, Safari et Edge */
+.product-carousel::-webkit-scrollbar {
+    display: none !important;
+}
+
+.nav-button {
+    position: absolute !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    background: white !important;
+    border: 1px solid #ccc !important;
+    border-radius: 50% !important;
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 1.5em !important;
+    cursor: pointer !important;
+    z-index: 10 !important;
+    color: #333 !important;
+    transition: all 0.3s ease !important;
+}
+
+.nav-button:hover {
+    background-color: #eee !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+}
+
+.prev-button {
+    left: 0 !important;
+}
+
+.next-button {
+    right: 0 !important;
+}
+
+/* Product Card Styling */
+.product-card {
+    flex: 0 0 auto !important;
+    width: 320px !important;
+    height: 400px !important; /* Réduit la hauteur pour correspondre à l'image d'origine */
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    scroll-snap-align: start !important;
+    transition: box-shadow 0.3s ease !important;
+}
+
+/* Common Product Item Style */
+.product-item {
+    background-color: #fff !important;
+    text-align: left !important;
+    padding: 15px !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Conteneur d'image avec positionnement pour l'effet de survol */
+.product-image-placeholder {
+    height: 80% !important;
+    background-color: #f1f1f1 !important;
+    margin-bottom: 5px !important;
+    position: relative !important; /* Référence pour les images enfants */
+    overflow: hidden !important;
+}
+
+/* Style de base des images */
+.product-img {
+    position: absolute !important;
+    min-height: 100% !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    
+    object-fit: cover !important;
+    transition: opacity 0.3s ease !important; /* Transition pour l'effet de fondu */
+}
+
+/* Gestion de l'opacité pour l'effet HOVER */
+.product-img-default {
+    opacity: 1 !important; /* Visible par défaut */
+}
+
+.product-img-hover {
+    opacity: 0 !important; /* Cachée par défaut */
+}
+
+/* Activation de l'effet au survol de la carte produit */
+.product-card.product-item:hover .product-img-default {
+    opacity: 0 !important; /* Cacher l'image par défaut */
+}
+
+.product-card.product-item:hover .product-img-hover {
+    opacity: 1 !important; /* Afficher l'image au survol */
+}
+
+.product-name {
+    font-size: 0.9em !important;
+    font-weight: 600 !important;
+    margin: 5px 0 0 !important;
+}
+
+.product-price {
+    font-size: 0.85em !important;
+    color: #666 !important;
+    margin: 0 !important;
+}
+
+/* Special Card Styling (98% Satisfied) */
+.special-card {
+    background-image: url('112.png') !important; /* REMPLACER PAR VOTRE IMAGE */
+    background-size: cover !important;
+    background-position: center !important;
+    width: 350px !important;
+    color: white !important;
+    display: flex !important;
+    align-items: flex-end !important;
+    text-align: left !important;
+    padding: 20px !important;
+    border-radius: 8px !important;
+    position: relative !important;
+}
+
+/* Overlay pour améliorer la lisibilité */
+.special-card::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0) 60%) !important;
+    z-index: 1 !important;
+}
+
+.special-content {
+    position: relative !important;
+    z-index: 2 !important;
+}
+
+.satisfaction-rate {
+    font-size: 2.5em !important;
+    font-weight: 700 !important;
+    margin-bottom: 0 !important;
+}
+
+.satisfaction-text {
+    font-size: 1.2em !important;
+    font-weight: 400 !important;
+    margin-top: 0 !important;
+}
+
+.discover-btn {
+    display: inline-block !important;
+    color: white !important;
+    text-decoration: none !important;
+    border: 1px solid white !important;
+    padding: 8px 15px !important;
+    margin-top: 10px !important;
+    font-size: 0.8em !important;
+    font-weight: 600 !important;
+    transition: background-color 0.3s !important;
+}
+
+.discover-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .section-title {
+        font-size: 2em !important;
+    }
+    
+    .carousel-container {
+        padding: 0 10px !important;
+    }
+
+    .nav-button {
+        width: 30px !important;
+        height: 30px !important;
+        font-size: 1.2em !important;
+    }
+
+    .product-card {
+        width: 200px !important; 
+        height: 350px !important;
+    }
+}
+
+
+
+/*la section de text */
+/* @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap'); */
+
+.valeurs-marque-section {
+    font-family: 'Arial', sans-serif; /* Remplacer par la police réelle */
+    text-align: center;
+    padding: 80px 20px;
+    background-color: #fff;
+    max-width: 1200px;
+    margin: 0 auto;
+    margin-bottom: 80px;
+}
+
+/* Conteneur de Texte */
+.slogan-container {
+    margin-bottom: 60px;
+}
+
+.slogan-petit {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    color: #000000;
+}
+
+.slogan-principal {
+    font-size: 2.5rem; /* Ajuster selon l'écran */
+    line-height: 1.2;
+    font-weight: 700;
+    margin-bottom: 30px;
+    color: #252525; /* Texte principal noir */
+}
+
+.slogan-principal .gris {
+    color: #bbbbbb; /* Texte secondaire gris */
+    font-weight: 400;
+}
+
+.btn-en-savoir-plus {
+    display: inline-block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: #727272;
+    text-decoration: none;
+    border-bottom: 1px solid #000000;
+    padding-bottom: 5px;
+    margin-top: 10px;
+    transition: opacity 0.3s;
+}
+
+.btn-en-savoir-plus:hover {
+    opacity: 0.7;
+}
+
+/* Conteneur d'Icônes */
+.icones-container {
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+    flex-wrap: wrap; /* Pour la réactivité */
+}
+
+.icone-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 20%; /* 4 éléments sur 100% (environ 25% chacun, avec un peu de marge) */
+    min-width: 120px; /* Assure que les éléments ne deviennent pas trop petits */
+}
+
+.icone-placeholder {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 15px;
+    color: #000000; /* Couleur des traits de l'icône */
+}
+
+.icone-placeholder svg {
+    width: 100%;
+    height: 100%;
+    stroke: currentColor;
+    stroke-width: 1.5; /* Épaisseur du trait, comme sur l'image */
+}
+
+.icone-texte {
+    font-size: 0.75rem;
+    line-height: 1.3;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #000000;
+}     
+/* Container for the buttons to allow horizontal scrolling/layout */
+        .filter-container {
+            display: flex;
+            gap: 15px; /* Space between buttons */
+            /* Add this if you want the container to handle overflow horizontally */
+            /* overflow-x: auto; */
+            /* padding: 10px 0; */
+        }
+
+        /* Style for the individual buttons/filters */
+        .filter-button {
+            /* General appearance */
+            padding: 12px 25px; /* Vertical and horizontal padding */
+            border: 1px solid #000000; /* Black border, 1px thick */
+            border-radius: 5px; /* Slightly rounded corners */
+            background-color: #fff; /* White background */
+            color: #000; /* Black text color */
+            
+            /* Text styling */
+            font-size: 14px;
+            font-weight: bold; /* Text appears bold/semi-bold in the image */
+            text-transform: uppercase; /* Text is uppercase */
+            white-space: nowrap; /* Prevents text from wrapping */
+            cursor: pointer; /* Indicates it's interactive */
+            
+            /* Transition for visual effect on hover (optional but good practice) */
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+            
+            /* Box shadow/outline effect seen in the image - this is a simple box model */
+            /* The image suggests a clean, simple border without shadow */
+            box-sizing: border-box;
+            
+            /* Ensure the height is uniform if the text differs slightly */
+            min-height: 45px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Optional: Hover effect for interactivity */
+        .filter-button:hover {
+            background-color: #b5b5b5;
+            color: #ffffff;
+
+        }
+
+    /* Style de base pour la section */
+.pack-croissance-section {
+    font-family: 'Arial', sans-serif; /* Remplacer par la police réelle (souvent sans-serif) */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 50px 20px;
+    gap: 40px; /* Espace entre les deux colonnes */
+    max-width: 1200px;
+    margin: 0 auto;
+    color: #000;
+}
+
+/* ---------------------------------- */
+/* COLONNE GAUCHE (Images) */
+/* ---------------------------------- */
+
+.colonne-gauche {
+    flex: 1; /* Prend une part équivalente de l'espace */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-produit-container {
+    position: relative; /* Sert de référence pour positionner les images en superposition */
+    /* Définir une taille de base si nécessaire, ou laisser les images la définir */
+    width: 100%; 
+    max-width: 750px; 
+}
+
+.image-sachet {
+    /* Le sachet est au premier plan, il est défini par sa taille réelle ou souhaitée */
+    width: 80%; 
+    height: auto;
+    object-fit: cover;
+    z-index: 2; /* Pour s'assurer qu'il est au-dessus de l'autre image */
+    position: relative;
+    display: block;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Ajoute un léger effet de profondeur */
+}
+
+.image-cheveux {
+    /* Le cheveux est derrière et décalé */
+    position: absolute;
+    top: -5%; /* Remonter légèrement */
+    right: -25%; /* Décaler à droite */
+    width: 70%; /* Une taille relative à son conteneur */
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+}
+
+/* ---------------------------------- */
+/* COLONNE DROITE (Texte) */
+/* ---------------------------------- */
+
+.colonne-droite {
+    flex: 1; /* Prend une part équivalente de l'espace */
+    text-align: left;
+    max-width: 500px;
+}
+
+.chiffre-cle {
+    font-size: 4rem; /* Grande taille */
+    line-height: 1;
+    font-weight: 700; /* Gras */
+    margin: 0 0 30px 0;
+    display: flex;
+    flex-direction: column; /* Pour aligner +6 cm au-dessus de "en 3 mois" */
+}
+
+.cercle-effet {
+    position: relative;
+    /* Styles pour la police */
+    font-size: 6rem; /* Encore plus grand pour le "+6 cm" */
+    line-height: 1;
+}
+
+/* Le cercle est créé via un pseudo-élément */
+.cercle-effet::after {
+    content: '';
+    position: absolute;
+    top: -15%; /* Ajuster la position verticale */
+    left: -5%; /* Ajuster la position horizontale */
+    width: 110%; /* Taille du cercle par rapport au texte */
+    height: 120%; /* Hauteur du cercle */
+    border: 3px solid #000; /* Bordure noire pour le cercle */
+    border-radius: 50%;
+    z-index: 0; /* Placé derrière le texte */
+    transform: rotate(-5deg); /* Légère inclinaison pour l'effet "dessiné" */
+}
+
+.texte-resultat {
+    font-size: 3rem; /* Ajusté pour être plus petit que le +6 cm */
+    font-weight: 500;
+    margin-top: -10px; /* Remonter légèrement le texte */
+}
+
+.categorie {
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    font-weight: 600;
+    margin: 0 0 10px 0;
+}
+
+.description {
+    font-size: 1.1rem;
+    line-height: 1.5;
+    margin-bottom: 30px;
+    max-width: 400px;
+}
+
+.cta-bouton {
+    display: inline-block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: #000;
+    text-decoration: none;
+    border-bottom: 1px solid #000;
+    padding-bottom: 5px;
+    transition: opacity 0.3s;
+}
+
+.cta-bouton:hover {
+    opacity: 0.7;
+}
+
+/* ---------------------------------- */
+/* Réactivité (pour les petits écrans) */
+/* ---------------------------------- */
+
+@media (max-width: 850px) {
+    .pack-croissance-section {
+        flex-direction: column; /* Les colonnes s'empilent */
+        text-align: center;
+    }
+
+    .colonne-droite {
+        margin-top: 50px;
+        text-align: center; /* Centrer le texte pour les mobiles */
+    }
+    
+    .chiffre-cle {
+        align-items: center; /* Centrer le texte du résultat */
+    }
+
+    .image-cheveux {
+        /* Simplifier le positionnement sur mobile */
+        right: -10%;
+        top: 0;
+        width: 60%;
+    }
+}
+
+    .video-gallery {
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px;
+    height: 650px;
+    margin: 0 auto;
+    height: 600px;
+    overflow: hidden;
+    position: relative;
+}
+
+/* --- Styles de base des aperçus --- */
+.video-preview {
+    height: 90%; 
+    margin: 0 -10px; 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    position: relative;
+    border-radius: 5px;
+    overflow: hidden; /* TRÈS important pour masquer le débordement de la vidéo */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+/* 🎯 Style de l'élément VIDEO à l'intérieur du conteneur */
+.video-preview video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Assure que la vidéo couvre le conteneur sans déformation */
+    z-index: 1; /* Place la vidéo en arrière-plan du timestamp et de l'overlay */
+}
+
+/* --- Contrôle de la Visibilité et de la Taille --- */
+
+/* Aperçus Extérieurs (Très estompés) */
+.preview-1, .preview-5 {
+    width: 15%; 
+    opacity: 1; /* L'opacité sera gérée par l'overlay blanc */
+    transform: scale(0.9);
+}
+
+/* Aperçus Intermédiaires (Moyennement visibles) */
+.preview-2, .preview-4 {
+    width: 18%; 
+    opacity: 0.7; /* Opacité appliquée à la vidéo elle-même */
+    transform: scale(0.95);
+}
+
+/* Aperçu Central (Clair et au premier plan) */
+.main-preview {
+    width: 25%; 
+    opacity: 1; 
+    z-index: 10;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* --- Gestion de l'Estompage Blanc (preview-1 et preview-5) --- */
+.video-preview .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    opacity: 0.8; /* Ajustez l'opacité ici pour le niveau de blanchiment */
+    z-index: 2; /* Devant la vidéo, derrière le timestamp */
+}
+
+/* --- Style de l'horodatage et de l'icône de lecture --- */
+.time-stamp {
+    position: absolute;
+    bottom: 10px;
+    right: 10px; 
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 3px 6px;
+    font-size: 0.7em;
+    border-radius: 3px;
+    z-index: 3; /* Le plus haut */
+}
+
+.preview-1 .time-stamp {
+    left: 10px; 
+    right: auto; 
+}
+
+/* Icône de lecture simulée (pour le centre) - utilise un pseudo-élément */
+.main-preview::before {
+    content: '▶';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    color: #333;
+    padding-left: 5px; 
+    z-index: 3;
+}
+/* --- Nouveaux Styles pour le Titre et le Sous-titre --- */
+.header-section {
+    text-align: center; /* Centre tout le contenu textuel */
+    padding: 50px 20px 30px; /* Espacement autour du texte */
+    max-width: 900px; /* Limite la largeur du texte pour la lisibilité */
+    margin: 0 auto; /* Centre le bloc du titre sur la page */
+}
+
+.header-section h1 {
+    font-family: sans-serif;
+    font-size: 2.5rem; /* Grosse taille de police pour le titre principal */
+    font-weight: 700; /* Gras pour l'impact */
+    color: #000; /* Noir intense */
+    margin-bottom: 10px; /* Petit espace sous le titre */
+}
+
+.header-section p {
+    font-family: sans-serif;
+    font-size: 1.1rem; /* Taille moyenne pour le sous-titre */
+    font-weight: 400; /* Normal */
+    color: #000;
+    margin-top: 0;
+}
+
+/*le style des deux card produit et la grand card !*/
+/* -------------------------------------- */
+/* 1. Conteneur principal (Flexbox) */
+/* -------------------------------------- */
+.section-container {
+    display: flex;
+    align-items: stretch; /* Assure une hauteur uniforme pour toutes les cartes */
+    gap: 20px;
+    max-width: 1400px;
+    height: 650px;
+    margin: 40px auto;
+    padding: 0 20px;
+    margin-bottom: 0px; /* Espace après la section */
+}
+
+/* -------------------------------------- */
+/* 2. Styles généraux des cartes          */
+/* -------------------------------------- */
+/* ---------------------------------------------------- */
+/* 1. Base des cartes */
+/* ---------------------------------------------------- */
+/* ---------------------------------------------------- */
+/* 0. Conteneur principal de la section (Indispensable) */
+/* ---------------------------------------------------- */
+/* Assurez-vous d'appliquer ce style au conteneur de vos cartes */
+/* ---------------------------------------------------- */
+/* 1. Structure de la Section et du Carrousel */
+/* ---------------------------------------------------- */
+/* 1. Structure de la Section et du Carrousel */
+/* ---------------------------------------------------- */
+.essentiels-section {
+    width: 100%;
+    padding: 20px 0;
+    text-align: center;
+}
+
+.section-title {
+    font-size: 2.2em;
+    font-weight: 900;
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+}
+
+.section-subtitle {
+    font-size: 1em;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.carousel-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.product-carousel {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    width: 100%;
+    padding: 10px 0;
+    align-items: stretch;
+}
+
+/* Masquer la barre de défilement */
+.product-carousel::-webkit-scrollbar {
+    display: none;
+}
+.product-carousel {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* ---------------------------------------------------- */
+/* 2. Styles Généraux des Cartes (.product-card) */
+/* ---------------------------------------------------- */
+.product-card {
+    flex: 0 0 280px; 
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 15px;
+    position: relative;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Forcer le lien HTML <a> à prendre toute la hauteur */
+.product-item a {
+    display: flex !important;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    text-decoration: none;
+    color: inherit;
+}
+
+/* ---------------------------------------------------- */
+/* 3. Carte Spéciale / Bannière (.special-card) */
+/* ---------------------------------------------------- */
+/* Conteneur principal de la carte */
+.product-card.special-card {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 420px; /* Ajustez la hauteur selon vos autres cartes */
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Aligne le contenu tout en bas */
+}
+
+/* Image de fond */
+.special-bg-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+}
+
+/* Conteneur du texte et du bouton en bas */
+.special-content {
+    position: relative;
+    z-index: 2;
+    padding: 24px;
+    color: #ffffff;
+    text-align: left;
+}
+
+/* Style du texte "98% clients" */
+.satisfaction-rate {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.1;
+    color: #ffffff;
+}
+
+.satisfaction-rate sup {
+    font-size: 1.1rem;
+    top: -0.5em;
+}
+
+/* Style du texte "satisfaits" */
+.satisfaction-text {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+    line-height: 1.1;
+    color: #ffffff;
+}
+
+/* Style du bouton "JE DÉCOUVRE" avec la ligne en dessous */
+.discover-btn {
+    display: inline-block;
+    color: #ffffff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    letter-spacing: 0.5px;
+    transition: opacity 0.2s ease;
+}
+
+.discover-btn:hover {
+    opacity: 0.8;
+}
+
+/* ---------------------------------------------------- */
+/* 4. Cartes Produits (.product-item) & Images */
+/* ---------------------------------------------------- */
+/* ---------------------------------------------------- */
+/* 4. Cartes Produits (.product-item) & Images */
+/* ---------------------------------------------------- */
+.product-item {
+    text-align: left;
+}
+
+/* Conteneur d'image */
+.product-image-placeholder {
+    position: relative;
+    width: 100%;
+    height: 250px; /* <--- Hauteur de l'image */
+    margin-bottom: 15px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Style de base des images */
+.product-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    transition: opacity 0.4s ease;
+}
+
+/* États par défaut (Sans !important ici) */
+.product-img-default {
+    opacity: 1;
+    z-index: 1;
+}
+
+.product-img-hover {
+    opacity: 0;
+    z-index: 2;
+}
+
+/* Effet au survol (Hover fonctionne à présent) */
+.product-card:hover .product-img-default {
+    opacity: 0 !important;
+}
+
+.product-card:hover .product-img-hover {
+    opacity: 1 !important;
+}
+
+/* ---------------------------------------------------- */
+/* 5. Informations Produit (Nom & Prix) */
+/* ---------------------------------------------------- */
+.product-name {
+    font-size: 1em;
+    font-weight: 600;
+    margin: 5px 0;
+    color: #222222;
+    text-transform: capitalize;
+}
+
+.product-price {
+    font-size: 0.95em;
+    margin-top: auto; /* Aligne le prix en bas de la carte */
+}
+
+/* ---------------------------------------------------- */
+/* 6. Boutons de Navigation (Flèches) */
+/* ---------------------------------------------------- */
+.nav-button {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    font-size: 1.2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    z-index: 10;
+    transition: background-color 0.2s ease;
+}
+
+.nav-button:hover {
+    background-color: #f5f5f5;
+}
+
+.prev-button {
+    margin-right: -10px;
+}
+
+.next-button {
+    margin-left: -10px;
+}
+
+/* ---------------------------------------------------- */
+/* 7. Adaptation Mobile (Moins de 900px) */
+/* ---------------------------------------------------- */
+@media (max-width: 900px) {
+    .product-card {
+        flex: 0 0 220px; /* Réduit légèrement la largeur des cartes sur mobile */
+    }
+    
+    .product-image-placeholder {
+        height: 200px; /* Ajuste la hauteur de l'image sur écran mobile */
+    }
+}
+    /* ------------------------------------------- */
+/* Section Styling photo folowing  */
+/* ------------------------------------------- */
+.diagnostic-section {
+    display: flex;
+    /* Ajustez min-height pour la hauteur de la section, 80vh est une suggestion */
+    max-height: 80vh;
+    /* Limite la largeur de la section sur les grands écrans */
+    max-width: 1200px; 
+    margin: 0 auto;
+    margin-bottom: 80px;
+    background-color: #fff;
+    /* Assurez-vous que l'ensemble de la section est centré si elle est plus petite que le viewport */
+}
+
+/* ------------------------------------------- */
+/* Left Column: Text Content */
+/* ------------------------------------------- */
+.diagnostic-content {
+    flex: 1; /* Prend 50% de la largeur */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centre le contenu verticalement */
+    padding: 50px 80px; /* Espacement intérieur */
+    text-align: left;
+}
+
+.subtitle {
+    font-size: 0.8em;
+    letter-spacing: 2px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.title {
+    font-size: 3.5em; /* Grand titre */
+    font-weight: 500; /* Poids de police, pas complètement "bold" */
+    margin: 0 0 30px 0;
+    line-height: 1.1;
+}
+
+.description {
+    font-size: 1.1em;
+    line-height: 1.6;
+    margin-bottom: 40px;
+    max-width: 80%; /* Améliore la lisibilité des longues lignes */
+}
+
+.btn-link {
+    text-decoration: none;
+    color: inherit; /* Utilise la couleur du texte parent (noir) */
+    font-weight: bold;
+    font-size: 0.9em;
+    padding-bottom: 5px; 
+    border-bottom: 2px solid #333; /* Effet de soulignement */
+    display: inline-block; /* Pour que le soulignement ne s'étende pas sur toute la largeur */
+    letter-spacing: 1px;
+    cursor: pointer;
+}
+
+/* ------------------------------------------- */
+/* Right Column: Media (Video) */
+/* ------------------------------------------- */
+.diagnostic-media {
+    flex: 1; /* Prend l'autre 50% de la largeur */
+    position: relative; /* Nécessaire pour positionner l'overlay */
+    overflow: hidden; 
+}
+
+/* Style de l'élément VIDEO (Remplaçant .media-image) */
+.media-video {
+    width: 100%;
+    height: 100%;
+    /* Rend la vidéo comme un fond : elle couvre la zone sans déformer ses proportions */
+    object-fit: cover; 
+    display: block;
+    /* Assombrissement léger pour que le texte blanc soit plus lisible */
+    filter: brightness(0.7); 
+}
+
+/* ------------------------------------------- */
+/* Text Overlay on Media */
+/* ------------------------------------------- */
+.media-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    /* Centre le texte précisément */
+    transform: translate(-50%, -50%);
+    color: white; 
+    font-size: 3.5em; 
+    font-weight: bold;
+    letter-spacing: 3px;
+    opacity: 0.7; /* Légèrement transparent */
+    z-index: 10; /* Assure que le texte est au-dessus de la vidéo */
+}
+
+
+
+
+        /* Variables de base */
+        :root {
+            --primary-color: #000;
+            --secondary-color: #fff;
+            --gap-size: 10px;
+        }
+
+        .follow-us-section {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 10px;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            color: var(--primary-color);
+        }
+
+        /* En-tête */
+        .header h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        /* --- Styles pour la Grille (PC First) --- */
+
+        .gallery-grid {
+    display: grid;
+    /* 5 colonnes: 2x petite | 1x grande | 2x petite */
+    grid-template-columns: repeat(2, 1fr) 2fr repeat(2, 1fr);
+    /* 2 lignes */
+    grid-template-rows: 1fr 1fr; 
+    
+    /* MODIFICATION : Utiliser column-gap et row-gap séparément */
+    column-gap: var(--gap-size); /* Espace horizontal */
+    row-gap: 10px; /* Espace vertical (augmenté à 40px, par exemple) */
+    
+    width: 100%;
+}
+
+        .grid-item {
+            position: relative;
+            overflow: hidden;
+            aspect-ratio: 1 / 1; 
+            cursor: pointer; /* Indiquer que l'élément est interactif */
+        }
+
+        .grid-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            /* Transition pour le zoom ou l'effet de couleur si désiré */
+            transition: transform 0.3s ease;
+        }
+
+        /* Calque de survol (Hover Overlay) */
+        .grid-item .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(1, 1, 1, 0.416); /* Noir semi-transparent */
+            opacity: 0; /* Masqué par défaut */
+            transition: opacity 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 5;
+        }
+
+        .grid-item .overlay a.hover-link {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            padding: 10px 20px;
+            border: 1px solid var(--secondary-color); /* Ajouter un bord pour le style */
+        }
+
+        /* Effet de Survol (Hover Effect) */
+        .grid-item:hover .overlay {
+            opacity: 1; /* Afficher le calque */
+        }
+        
+        /* Vous pouvez aussi ajouter un léger zoom sur l'image lors du survol */
+        .grid-item:hover img {
+             transform: scale(1.03); 
+        }
+
+        /* Positionnement spécifique pour l'image principale (PC) */
+        .main-image {
+            grid-column: 3; 
+            grid-row: 1 / span 2; 
+            aspect-ratio: auto; 
+        }
+
+        /* Positionnement des éléments de la grille (PC) */
+        .item-1 { grid-area: 1 / 1 / 2 / 2; } 
+        .item-2 { grid-area: 1 / 2 / 2 / 3; } 
+        .item-4 { grid-area: 1 / 4 / 2 / 5; } 
+        .item-5 { grid-area: 1 / 5 / 2 / 6; } 
+        .item-6 { grid-area: 2 / 1 / 3 / 2; } 
+        .item-7 { grid-area: 2 / 2 / 3 / 3; } 
+        .item-8 { grid-area: 2 / 4 / 3 / 5; } 
+        .item-9 { grid-area: 2 / 5 / 3 / 6; } 
+
+        /* Style pour la barre noire (item-7, qui n'est pas une image) */
+        .black-bar {
+            background-color: var(--primary-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* Retirer l'effet de survol pour la barre noire (item-7) */
+        .black-bar .overlay {
+            display: none;
+        }
+        
+        /* Les légendes existantes doivent apparaître au-dessus du calque */
+        .caption {
+            position: absolute;
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-align: right;
+            line-height: 1.2;
+            z-index: 10; /* Doit être supérieur à l'overlay (z-index: 5) */
+            padding: 5px;
+            color: var(--secondary-color); /* S'assurer que le texte est lisible sur les images */
+        }
+
+        .top-right { top: 10px; right: 10px; }
+        .bottom-right { bottom: 10px; right: 10px; }
+
+
+        /* Lien MORE en bas de la section */
+        .more-link {
+            margin-top: 40px;
+            display: inline-block;
+        }
+
+        .more-link a {
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: bold;
+            padding-bottom: 5px;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+        }
+
+        .more-link .underline {
+            width: 30px; 
+            height: 2px;
+            background-color: var(--primary-color);
+            margin: 5px auto 0;
+        }
+
+        /* --- Media Query pour Mobile (max 768px) --- */
+
+        @media (max-width: 768px) {
+            .gallery-grid {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: auto;
+                gap: 5px; 
+            }
+            
+            .grid-item {
+                aspect-ratio: 1 / 1;
+                grid-column: auto !important;
+                grid-row: auto !important;
+            }
+
+            .main-image {
+                grid-column: 1 / span 2; 
+                aspect-ratio: 16 / 9; 
+                order: 3; 
+            }
+            
+            .item-1 { order: 1; } 
+            .item-2 { order: 2; } 
+            .item-4 { order: 4; } 
+            .item-5 { order: 5; } 
+            .item-6 { order: 6; } 
+            .item-7 { order: 7; } 
+            .item-8 { order: 8; } 
+            .item-9 { order: 9; } 
+            
+            /* Sur mobile, on désactive l'effet de survol car il n'est pas pratique */
+            .grid-item .overlay {
+                opacity: 0;
+                display: none;
+            }
+        }
+
+
+
+
+    /* --- Styles de la Section Hero Contact --- */
+
+.contact-hero-section {
+    position: relative;
+    width: 100%;
+    min-height: 450px; /* Hauteur de la section */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    overflow: hidden;
+
+    /* REMPLACER l'URL par votre image de fond */
+    background-image: url('222.jpg'); 
+    background-size: cover;
+    background-color: #ffffff !important;
+    background-position: center 30%; /* Ajuste le point de focus vertical */
+    
+    /* Appliquer un filtre de couleur et un léger assombrissement pour l'ambiance */
+    filter: grayscale(80%) brightness(80%); 
+}
+
+/* Contenu textuel (CONTACT) */
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-content h1 {
+    font-family: serif; /* Utilisation d'une police serif ou personnalisée */
+    font-size: 4em;
+    color: #ffffff;
+    margin-bottom: 5px;
+    font-weight: 400;
+    letter-spacing: 5px;
+}
+
+/* Ligne décorative verte */
+.underline {
+    width: 60px;
+    height: 3px;
+    background-color: #0044aa; /* Vert du logo */
+    margin: 0 auto;
+}
+
+/* Bouton de langue (Flag dropdown) */
+.flag-dropdown {
+    position: absolute;
+    bottom: 0;
+    left: 40px;
+    padding: 8px 15px;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 5px 5px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9em;
+    cursor: pointer;
+    z-index: 3;
+}
+
+.flag-dropdown img {
+    width: 20px;
+    height: 15px;
+}
+
+.flag-dropdown .arrow {
+    font-size: 0.7em;
+    transform: rotate(180deg); /* Faire pointer le ^ vers le bas */
+    display: inline-block;
+}
+
+    /* Section Styling */
+.values-section {
+    max-width: 1200px; /* Limit the width of the whole section */
+    margin: 50px auto; /* Center the section and add vertical spacing */
+    padding: 20px;
+    text-align: center; /* Center the h2 title */
+}
+
+.values-section h2 {
+    font-size: 3em;
+    font-weight: 400; /* Lighter font weight for the title */
+    margin-bottom: 50px;
+    color: #333;
+}
+
+/* Grid Layout for Values */
+.values-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two columns of equal width */
+    gap: 15px; /* Spacing between the grid items */
+    text-align: left; /* Reset text alignment for the items */
+}
+
+/* Individual Value Item Styling */
+.value-item {
+    background-color: #ffffff; /* White background for each item */
+    border-radius: 8px; /* Slightly rounded corners */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Very light box shadow (optional) */
+    overflow: hidden; /* Important for the hidden content */
+}
+
+.value-header {
+    display: flex;
+    justify-content: space-between; /* Space title and icon */
+    align-items: center;
+    padding: 15px 25px; /* Internal padding */
+    font-size: 1.1em;
+    font-weight: 500;
+    cursor: pointer; /* Indicates it's interactive */
+    color: #333;
+    transition: background-color 0.2s;
+}
+
+.value-header:hover {
+    background-color: #f7f7f7;
+}
+
+.toggle-icon {
+    font-size: 1.5em;
+    line-height: 1;
+    transform: rotate(0deg); /* Initial state: plus sign */
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Active state for the header when content is visible */
+.value-item.active .toggle-icon {
+    transform: rotate(45deg); /* Change + to X (or a rotated plus) */
+}
+
+/* Collapsible Content Styling */
+.value-content {
+    /* Initial state: Hidden */
+    max-height: 0;
+    padding: 0 25px; /* Add horizontal padding */
+    transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+    overflow: hidden; /* Hide overflow content */
+}
+
+.value-item.active .value-content {
+    /* Active state: Visible */
+    max-height: 200px; /* A value larger than the content's expected height */
+    padding: 15px 25px; /* Vertical padding when active */
+    border-top: 1px solid #eee; /* Separator line when open */
+}
+
+.value-content p {
+    margin-top: 0;
+    margin-bottom: 15px; /* Match the padding above */
+    line-height: 1.6;
+    color: #666;
+}
+
+/* Media Query for Responsiveness (Optional: for mobile view) */
+@media (max-width: 768px) {
+    .values-grid {
+        grid-template-columns: 1fr; /* Single column on smaller screens */
+        padding: 0 10px;
+    }
+}
+        .content-container {
+    max-width: 100%; /* Largeur maximale pour le bloc de contenu */
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Sous-titre */
+.subtitle {
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+/* Titre principal */
+.title {
+    font-size: 50px; /* Ajustez la taille selon l'effet désiré */
+    font-weight: 500; /* Poids de la police pour un rendu élégant */
+    line-height: 1.1;
+    margin: 0 0 50px 0;
+}
+
+
+
+/* Bloc de texte descriptif */
+.text-block {
+    margin-top: 50px;
+}
+
+.text-block p {
+    font-size: 18px; /* Taille de police pour le corps du texte */
+    line-height: 1.6;
+    margin-bottom: 25px; /* Espace entre les deux paragraphes */
+    text-align: center;
+}
+
+/* Ajustements de style pour le texte pour coller à l'image */
+.text-block p:first-child {
+    max-width: 780px; /* Contraint la largeur du premier paragraphe */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.text-block p:last-child {
+    max-width: 740px; /* Contraint la largeur du second paragraphe */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Media Query pour les petits écrans (pour que le texte reste lisible) */
+@media (max-width: 768px) {
+    .title {
+        font-size: 50px;
+    }
+    
+    .text-block p {
+        font-size: 16px;
+    }
+}
+.excellence-section {
+    display: flex; /* Utilisation de Flexbox pour aligner le texte et l'image */
+    align-items: center; /* Centrer verticalement les éléments */
+    max-width: 1200px; /* Limiter la largeur du conteneur, ajustez selon le design */
+    margin: 0 auto; /* Centrer la section sur la page */
+    padding: 60px 20px;
+    background-color: var(--couleur-fond-section);
+}
+
+.texte-contenu {
+    flex: 1; /* Permet au texte de prendre l'espace disponible */
+    max-width: 50%; /* Limite la largeur du bloc de texte à la moitié */
+    padding-right: 40px;
+}
+
+.image-aloe {
+    flex: 1; /* Permet à l'image de prendre l'autre moitié */
+    max-width: 50%;
+    display: flex;
+    justify-content: flex-end; /* Aligner l'image à droite dans son conteneur */
+}
+
+.image-aloe img {
+    width: 100%; /* L'image remplit la largeur de son conteneur */
+    height: 500px;
+    display: block;
+    /* Ajoutez des styles pour le contour ou les effets de l'image si nécessaire */
+}
+
+/* Styles pour le texte */
+.slogan {
+    font-family: var(--police-principale);
+    font-size: 0.9em;
+    color: var(--couleur-slogan);
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.titre {
+    font-family: var(--police-principale);
+    font-size: 3.5em; /* Ajustez la taille du titre */
+    line-height: 1.1;
+    color: var(--couleur-texte-principal);
+    font-weight: 700; /* Gras */
+    margin: 0 0 20px 0;
+}
+
+.description {
+    font-family: var(--police-principale);
+    font-size: 1em;
+    line-height: 1.6;
+    color: var(--couleur-texte-principal);
+    max-width: 90%; /* Ajustez pour que le texte ait une largeur similaire à celle de l'exemple */
+}
+
+/* Media Query pour les petits écrans (alignement en colonne) */
+@media (max-width: 768px) {
+    .excellence-section {
+        flex-direction: column; /* Les éléments passent en colonne */
+        padding: 40px 20px;
+    }
+
+    .texte-contenu, .image-aloe {
+        max-width: 100%; /* Prend toute la largeur */
+        padding-right: 0;
+    }
+
+    .texte-contenu {
+        order: 2; /* Pour que le texte soit après l'image sur mobile, ajustez si besoin */
+        margin-top: 30px;
+    }
+
+    .image-aloe {
+        order: 1;
+        margin-bottom: 20px;
+    }
+
+    .titre {
+        font-size: 2.5em;
+    }
+
+    .description {
+        max-width: 100%;
+    }
+}
+    /* Styles pour la section */
+.optipharm-section-image {
+    
+    justify-content: center;
+    align-items: center;
+    min-height: 250px; /* Hauteur minimale pour centrer l'image */
+    background-color: #ffffff; /* Arrière-plan (ajustez si besoin) */
+    padding: 20px;
+}
+
+/* Conteneur pour l'image (optionnel, mais bon pour la gestion de la taille) */
+.optipharm-image-container {
+    max-width: 100%; /* S'assure que le conteneur ne dépasse pas la taille de la section */
+}
+
+/* Styles pour l'image elle-même */
+.optipharm-logo {
+    display: block; /* Supprime l'espace sous l'image */
+    width: 100%;    /* L'image prend toute la largeur du conteneur */
+    max-width: 100%; /* Définissez une taille maximale pour éviter un étirement excessif sur grand écran */
+    height: auto;   /* Maintient les proportions de l'image */
+    margin: 0 auto; /* Centre l'image dans le conteneur */
+}
+
+/* Votre barre d'actions existante (stylisée simplement pour le contexte) */
+.action-icons {
+
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 15px;
+    z-index: 99; /* Assurez-vous qu'elle est au-dessus du contenu normal */
+}
+.action-icons a {
+    color: #333;
+    font-size: 20px;
+}
+
+/* L'Overlay (la fenêtre modale) */
+.search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Couleur d'arrière-plan semi-transparente comme dans la capture */
+    background-color: rgba(0, 0, 0, 0.8); 
+    z-index: 100; /* Assurez-vous qu'elle est au-dessus de tout */
+    display: none; /* Caché par défaut, JavaScript l'affichera */
+    overflow-y: auto; /* Permet le défilement si le contenu est trop grand */
+}
+
+/* Le conteneur du contenu (fond blanc) */
+.search-content {
+    background-color: white;
+    width: 100%;
+    padding: 0 5%; 
+    box-sizing: border-box;
+}
+
+/* --- Le Header (Barre de Recherche) --- */
+.search-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.search-input-group {
+    display: flex;
+    align-items: center;
+    width: 90%;
+}
+
+.search-input-group i {
+    font-size: 20px;
+    margin-right: 15px;
+    color: #333;
+}
+
+.search-input-group input {
+    border: none;
+    font-size: 20px;
+    padding: 10px 0;
+    width: 100%;
+    outline: none; /* Retire le contour au focus */
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 40px;
+    color: #333;
+    cursor: pointer;
+}
+
+/* --- Le Corps (Colonnes de Contenu) --- */
+.search-body {
+    display: flex;
+    gap: 50px;
+    padding: 40px 0;
+}
+
+.section-column {
+    flex: 1;
+}
+
+.section-column h3 {
+    font-size: 14px;
+    color: #888;
+    text-transform: uppercase;
+    margin-bottom: 25px;
+}
+
+.hello-text {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* --- Cartes de Produits Recommandés --- */
+.product-recommendation {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
+
+.product-recommendation img {
+    width: 60px; /* Taille approximative de la petite bouteille */
+    height: 60px;
+    margin-right: 15px;
+    background-color: #f0f0f0; /* Couleur pour le placeholder */
+    object-fit: cover;
+}
+
+.product-recommendation p {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+/* --- Le Pied de Page (Bottom part) --- */
+.footer-overlay-content {
+    /* Style pour ressembler à la partie inférieure sombre */
+    background-color: #333; 
+    color: white;
+    padding: 50px 5%;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.footer-links {
+    display: flex;
+    gap: 100px; /* Espace entre les colonnes de liens */
+    margin-bottom: 30px;
+}
+
+.footer-links h4 {
+    margin-top: 0;
+    font-size: 16px;
+}
+
+.footer-links p {
+    font-size: 14px;
+    margin: 8px 0;
+    cursor: pointer;
+}
+
+/* Media Query pour les petits écrans (responsive) */
+@media (max-width: 768px) {
+    .search-body {
+        flex-direction: column;
+        gap: 30px;
+    }
+    .footer-links {
+        flex-direction: column;
+        gap: 30px;
+    }
+}
+  /* Styles généraux pour le conteneur principal */
+.service-client {
+    display: flex;
+    justify-content: center; /* Centre le contenu horizontalement */
+    align-items: center; /* Centre le contenu verticalement (si nécessaire) */
+    padding: 50px 20px; /* Espace autour de la section */
+    background-color: #fff; /* Fond blanc comme sur l'image */
+    /* Ligne grise subtile en bas, si elle fait partie de la section conteneur */
+    /* border-bottom: 1px solid #ccc; */
+}
+
+/* Conteneur de texte pour limiter la largeur et centrer le bloc */
+.conteneur-texte {
+    max-width: 650px; /* Largeur maximale pour le bloc de texte, similaire à l'image */
+    text-align: center; /* Centre le texte à l'intérieur du bloc */
+    font-family: Arial, sans-serif; /* Police similaire */
+    line-height: 1.6;
+    color: #333; /* Couleur de texte foncée */
+}
+
+/* Style du paragraphe d'introduction */
+.texte-intro {
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+/* Style du numéro de téléphone */
+.telephone {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 10px 0 20px 0; /* Espace au-dessus et en dessous */
+    /* Conteneur pour le fond rose autour du téléphone si désiré, mais ici on le stylise juste */
+}
+
+/* Style du lien du téléphone */
+.telephone a {
+    color: #1e28e9; /* Couleur rose/magenta pour le numéro */
+    text-decoration: none; /* Enlève le soulignement */
+}
+
+/* Style de l'icône du téléphone (peut être retiré si vous utilisez l'icône directement dans le HTML) */
+.icone-telephone {
+    color: #1e1ee9;
+    margin-right: 5px;
+}
+
+/* Style des horaires */
+.horaires {
+    font-size: 16px;
+    margin-top: 20px;
+}
+@media (max-width: 768px) {
+    /* Ajustements pour les écrans plus petits (téléphones et tablettes) */
+
+    .service-client {
+        padding: 30px 15px; /* Réduit le rembourrage sur les petits écrans */
+    }
+
+    .conteneur-texte {
+        max-width: 100%; /* Permet au bloc de prendre toute la largeur disponible (avec le padding) */
+        padding: 0 10px; /* Ajoute un petit padding intérieur pour ne pas coller les bords */
+    }
+
+    /* Réduit légèrement la taille de la police pour le mobile */
+    .texte-intro,
+    .horaires {
+        font-size: 15px;
+    }
+
+    /* Réduit la taille de la police du numéro de téléphone */
+    .telephone {
+        font-size: 18px;
+        margin: 15px 0;
+    }
+}
+  /* ---------------------------------------------------------------- */
+/* --- 1. Conteneur principal (PC) --- */
+/* ---------------------------------------------------------------- */
+.auth-container {
+    /* Centrer le bloc sur la page */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 60px 20px; /* Padding ajusté pour un meilleur rendu visuel */
+    max-width: var(--max-content-width);
+    margin: 0 auto;
+    line-height: 1.6;
+    /* Retrait de max-height: 80vh !important; car il peut créer des problèmes de scroll sur mobile */
+}
+
+/* Styles des deux colonnes (Login et Avantages) */
+.login-section,
+.benefits-section {
+    flex-grow: 1;
+    padding: 0 40px; 
+    max-width: 600px; /* Limite la largeur de la colonne de contenu */
+    box-sizing: border-box;
+}
+
+.login-section {
+    /* Marge/Padding ajusté pour simuler l'espace de l'image (Plus de padding extérieur) */
+    padding-right: 70px;
+    padding-left: 100px;
+}
+
+.benefits-section {
+    padding-left: 70px;
+    padding-right: 100px;
+}
+
+/* 2. Styles des titres et des paragraphes */
+h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.login-section p:first-of-type {
+    margin-bottom: 2rem;
+    font-size: 1rem;
+    color: var(--primary-color);
+}
+
+.legal-text {
+    font-size: 0.75rem;
+    color: var(--secondary-color);
+    margin-top: 2.5rem; /* Augmentation pour plus d'espace après le bouton */
+    line-height: 1.5;
+}
+
+/* 3. Styles des liens */
+a {
+    color: var(--link-color);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+.reset-link,
+.legal-text a {
+    font-size: 0.875rem;
+    text-decoration: underline;
+    font-weight: 600;
+    color: var(--link-color);
+}
+
+/* 4. Section de Connexion (Formulaire) */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    /* Gap retiré, la marge est gérée par .input-group */
+}
+
+/* Cacher l'étiquette (visuellement) */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 30px; /* Espace après chaque champ */
+}
+
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px 0 5px 0;
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 1rem;
+    color: var(--primary-color);
+    outline: none;
+}
+
+input::placeholder {
+    color: var(--primary-color);
+}
+
+.password-group {
+    margin-bottom: 0; 
+}
+
+.password-toggle {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 1rem;
+    color: var(--primary-color);
+}
+
+.options-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 5px;
+    font-size: 0.875rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.checkbox-label span {
+    margin-left: 5px;
+}
+
+/* Style de la case à cocher (simplifié) */
+input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--border-color);
+    background-color: var(--background-color);
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+    cursor: pointer;
+}
+
+input[type="checkbox"]:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Bouton SE CONNECTER */
+.btn-connect {
+    width: 100%;
+    padding: 12px 20px;
+    margin-top: 25px; /* Espace entre les options et le bouton */
+    background-color: var(--background-color);
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-connect:hover {
+    background-color: #f5f5f5; /* Léger changement de couleur au survol */
+}
+
+/* 5. Séparateur vertical (Visible sur PC) */
+.separator {
+    width: 1px;
+    min-height: 500px;
+    background-color: #e0e0e0;
+    margin: 0 40px;
+}
+
+/* 6. Section des Avantages */
+
+.benefits-section p {
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+    font-weight: 600; /* Le paragraphe de l'image est en gras */
+}
+
+.image-placeholder {
+    /* Ceci est le conteneur pour l'image. */
+    width: 100%;
+    height: auto; 
+    margin-bottom: 2rem;
+}
+
+.image-placeholder img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.benefit-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.benefit-list li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+.benefit-list li::before {
+    content: '✓';
+    color: var(--primary-color);
+    font-weight: 700;
+    font-size: 1.1rem;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+/* ---------------------------------------------------------------- */
+/* --- MEDIA QUERY : VERSION MOBILE / TABLETTE (max-width: 900px) --- */
+/* ---------------------------------------------------------------- */
+@media (max-width: 900px) { 
+    .auth-container {
+        /* Les sections s'empilent verticalement */
+        flex-direction: column; 
+        align-items: center;
+        padding: 0; /* Retrait du padding horizontal du conteneur principal */
+    }
+
+    /* Les deux sections prennent la pleine largeur */
+    .login-section,
+    .benefits-section {
+        max-width: 100%;
+        width: 100%;
+        /* Padding symétrique pour le mobile */
+        padding: 40px 20px; 
+    }
+
+    /* Ajout d'une ligne de séparation horizontale et masquage du séparateur vertical */
+    .login-section {
+        border-right: none;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .separator {
+        display: none;
+    }
+    
+    /* Adapter la ligne d'options pour qu'elle s'empile */
+    .options-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    /* Assurer que le lien de réinitialisation ne soit pas collé */
+    .options-row .reset-link {
+        margin-top: 5px;
+    }
+
+    /* Réduction de la taille des titres pour le mobile */
+    h2 {
+        font-size: 1.3rem;
+    }
+}
+
+    /* Styles généraux et PC */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #fff;
+    margin: 0;
+}
+
+.faq-section {
+    max-width: 1200px;
+    margin: 80px auto; /* Espace autour de la section */
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+/* Titre principal */
+.faq-title {
+    font-size: 3rem; /* Grande taille de police */
+    font-weight: 500; /* Poids moyen */
+    text-align: center;
+    margin-bottom: 50px;
+    color: #000;
+}
+
+/* Grille de mise en page pour les questions (2 colonnes) */
+.faq-grid {
+    display: grid;
+    /* Deux colonnes de taille égale avec un espacement (gap) */
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* Style de chaque bloc de question/réponse */
+.faq-item {
+    border: none; /* Les éléments n'ont pas de bordure individuelle */
+    box-shadow: none;
+    margin-bottom: 20px; /* Espace entre les lignes */
+}
+
+/* Bouton/Question (la partie visible) */
+.faq-question {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+    
+    /* Style du fond blanc cassé/gris clair */
+    background-color: #f8f8f8; 
+    
+    padding: 20px 25px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #000;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    
+    /* Bordures subtiles pour séparer visuellement, comme sur l'image */
+    border-radius: 5px; 
+    /* Box shadow très subtil peut être ajouté pour l'effet de carte */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
+}
+
+/* Icône '+' */
+.faq-icon {
+    font-size: 1.5rem;
+    font-weight: 300;
+    transition: transform 0.3s ease;
+}
+
+/* Contenu de la réponse (caché par défaut) */
+.faq-answer {
+    /* En production, utilisez max-height: 0; overflow: hidden; et une classe JS pour afficher */
+    max-height: 0;
+    overflow: hidden;
+    padding: 0 25px;
+    transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+}
+
+/* Style de la réponse affichée (à ajouter via JS pour .active) */
+.faq-item.active .faq-answer {
+    max-height: 200px; /* Hauteur suffisante pour le contenu */
+    padding: 15px 25px 25px 25px;
+    background-color: #fff;
+    border: 1px solid #f0f0f0;
+    border-top: none;
+    border-radius: 0 0 5px 5px;
+}
+
+.faq-item.active .faq-question {
+    background-color: #fff;
+    border-radius: 5px 5px 0 0;
+    box-shadow: none;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.faq-item.active .faq-icon {
+    transform: rotate(45deg); /* Tourne le '+' en 'x' */
+}
+@media (max-width: 768px) {
+    .faq-section {
+        margin: 40px auto;
+        padding: 0 15px;
+    }
+
+    /* Le titre est centré et légèrement plus petit */
+    .faq-title {
+        font-size: 2rem;
+        margin-bottom: 30px;
+    }
+
+    /* Passage à une seule colonne sur mobile */
+    .faq-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    /* Réduction du padding et de la taille de police pour le mobile */
+    .faq-question {
+        padding: 15px 20px;
+        font-size: 0.95rem;
+    }
+
+    .faq-answer {
+        padding: 0 20px;
+    }
+}

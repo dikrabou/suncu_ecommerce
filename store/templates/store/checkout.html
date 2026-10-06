@@ -1,0 +1,590 @@
+{% extends 'store/base.html' %}
+
+{% block content %}
+<div class="checkout-wrapper">
+    <!-- COLONNE GAUCHE (Formulaire) -->
+    <div class="checkout-left">
+        <header class="checkout-header">
+            <a href="{% url 'home' %}" class="cart-icon-link">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
+            </a>
+        </header>
+
+        <form method="POST" id="checkoutForm">
+            {% csrf_token %}
+
+            <!-- Contact -->
+            <section class="section-block">
+                <div class="section-header">
+                    <h2>Contact</h2>
+                    {% if not user.is_authenticated %}
+                        <a href="{% url 'login' %}" class="link-login">Se connecter</a>
+                    {% endif %}
+                </div>
+                <div class="field-container">
+                    <input type="text" name="contact_info" placeholder="E-mail ou numéro de portable" class="input-field" value="{{ user.email|default:'' }}" required>
+                    <span class="info-icon">?</span>
+                </div>
+                <label class="checkbox-container">
+                    <input type="checkbox" name="marketing_email" checked>
+                    <span>Envoyez-moi des nouvelles et des offres par e-mail</span>
+                </label>
+            </section>
+
+            <!-- Livraison -->
+            <section class="section-block">
+                <h2>Livraison</h2>
+                <div class="field-container select-wrapper">
+                    <label class="floating-label">Pays/région</label>
+                    <select name="country" class="input-field select-field">
+                        <option value="Algérie" selected>Algérie</option>
+                    </select>
+                </div>
+
+                <div class="field-row">
+                    <input type="text" name="first_name" placeholder="Prénom (optionnel)" class="input-field" value="{{ user.first_name|default:'' }}">
+                    <input type="text" name="last_name" placeholder="Nom" class="input-field" value="{{ user.last_name|default:'' }}" required>
+                </div>
+
+                <div class="field-container">
+                    <input type="text" name="address" placeholder="Adresse exacte" class="input-field" required>
+                </div>
+
+                <div class="field-row">
+                    <input type="text" name="commune" placeholder="Commune" class="input-field" required>
+                    
+                    <!-- Wilaya Select Dynamique -->
+                    <select name="wilaya_id" id="wilayaSelect" class="input-field select-field" required>
+                        <option value="" data-home="0" data-desk="0" selected disabled>Sélectionnez la Wilaya</option>
+                        {% for w in wilayas %}
+                            <option value="{{ w.id }}" data-home="{{ w.home_price }}" data-desk="{{ w.desk_price }}">
+                                {{ w.code }} - {{ w.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="field-container">
+                    <input type="text" name="phone" placeholder="Téléphone" class="input-field" required>
+                    <span class="info-icon">?</span>
+                </div>
+
+                <label class="checkbox-container">
+                    <input type="checkbox" name="save_info">
+                    <span>Sauvegarder mes coordonnées pour la prochaine fois</span>
+                </label>
+                <label class="checkbox-container">
+                    <input type="checkbox" name="marketing_sms">
+                    <span>Envoyez-moi des nouvelles et des offres par SMS</span>
+                </label>
+            </section>
+
+            <!-- Mode d'expédition Dynamique -->
+            <section class="section-block">
+                <h2>Mode d'expédition</h2>
+                <div class="shipping-box">
+                    <label class="shipping-item selected">
+                        <input type="radio" name="shipping_method" value="stop_desk" checked>
+                        <span class="custom-radio"></span>
+                        <div class="shipping-details">
+                            <span class="shipping-title">Livraison Bureau (STOP DESK)</span>
+                            <span class="shipping-price" id="deskPriceDisplay">0,00 DA</span>
+                        </div>
+                    </label>
+
+                    <label class="shipping-item">
+                        <input type="radio" name="shipping_method" value="home">
+                        <span class="custom-radio"></span>
+                        <div class="shipping-details">
+                            <span class="shipping-title">Livraison à Domicile</span>
+                            <span class="shipping-price" id="homePriceDisplay">0,00 DA</span>
+                        </div>
+                    </label>
+                </div>
+            </section>
+
+            <!-- Paiement -->
+            <section class="section-block">
+                <h2>Paiement</h2>
+                <p class="sub-text">Toutes les transactions sont sécurisées et chiffrées.</p>
+                <div class="payment-box">
+                    <div class="payment-header">
+                        <span class="radio-dot"></span>
+                        <span>Paiement à la livraison (COD)</span>
+                    </div>
+                    <div class="payment-body">
+                        Paiement cash à la réception du colis.
+                    </div>
+                </div>
+            </section>
+
+            <button type="submit" class="btn-submit-order">Valider la commande</button>
+        </form>
+
+        <footer class="checkout-footer-links">
+            <a href="#">Politique de remboursement</a>
+            <a href="#">Expédition</a>
+            <a href="#">Politique de confidentialité</a>
+            <a href="#">Conditions d'utilisation</a>
+            <a href="#">Contact</a>
+        </footer>
+    </div>
+
+    <!-- COLONNE DROITE (Récapitulatif Panier) -->
+    <div class="checkout-right">
+        <div class="summary-container">
+            <!-- Liste des articles -->
+            <div class="items-list">
+                {% for item in items %}
+                <div class="cart-item">
+                    <div class="item-thumb">
+                        {% if item.product.main_image %}
+                            <img src="{{ item.product.main_image.url }}" alt="{{ item.product.name }}">
+                        {% endif %}
+                        <span class="item-badge">{{ item.quantity }}</span>
+                    </div>
+                    <div class="item-info">
+                        <span class="item-name">{{ item.product.name }}</span>
+                    </div>
+                    <div class="item-price">
+                        {{ item.total_price|floatformat:2 }} DA
+                    </div>
+                </div>
+                {% empty %}
+                <p>Votre panier est vide.</p>
+                {% endfor %}
+            </div>
+
+            <!-- Code Promo -->
+            <div class="discount-block">
+                <input type="text" placeholder="code de réduction" class="input-field discount-input">
+                <button type="button" class="btn-apply-discount">Valider</button>
+            </div>
+
+            <!-- Sous-totaux -->
+            <div class="pricing-summary">
+                <div class="price-row">
+                    <span>Sous-total</span>
+                    <span id="subtotalDisplay" data-subtotal="{{ subtotal }}">{{ subtotal|floatformat:2 }} DA</span>
+                </div>
+                <div class="price-row">
+                    <span>Expédition <span class="info-icon">?</span></span>
+                    <span id="shippingDisplay">0,00 DA</span>
+                </div>
+                <div class="price-row total-row">
+                    <span>Total</span>
+                    <div class="total-amount">
+                        <small>DZD</small>
+                        <strong id="finalTotalDisplay">{{ subtotal|floatformat:2 }} DA</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const wilayaSelect = document.getElementById('wilayaSelect');
+    const shippingRadios = document.querySelectorAll('input[name="shipping_method"]');
+    
+    const deskPriceDisplay = document.getElementById('deskPriceDisplay');
+    const homePriceDisplay = document.getElementById('homePriceDisplay');
+    
+    const shippingDisplay = document.getElementById('shippingDisplay');
+    const finalTotalDisplay = document.getElementById('finalTotalDisplay');
+    const subtotalElem = document.getElementById('subtotalDisplay');
+
+    const baseSubtotal = parseFloat(subtotalElem.getAttribute('data-subtotal')) || 0;
+
+    function formatPrice(amount) {
+        if (amount === 0) return 'GRATUIT';
+        return amount.toFixed(2).replace('.', ',') + ' DA';
+    }
+
+    function recalculateTotal() {
+        const selectedOption = wilayaSelect.options[wilayaSelect.selectedIndex];
+        
+        // Extraction des tarifs depuis les data-attributes de la Wilaya choisie
+        const deskPrice = parseFloat(selectedOption.getAttribute('data-desk')) || 0;
+        const homePrice = parseFloat(selectedOption.getAttribute('data-home')) || 0;
+
+        // Mise à jour des libellés dans le bloc Mode d'expédition
+        deskPriceDisplay.textContent = formatPrice(deskPrice);
+        homePriceDisplay.textContent = formatPrice(homePrice);
+
+        // Déterminer la méthode sélectionnée (STOP DESK vs HOME)
+        const selectedRadio = document.querySelector('input[name="shipping_method"]:checked');
+        let activeShippingCost = 0;
+
+        if (selectedRadio.value === 'home') {
+            activeShippingCost = homePrice;
+        } else {
+            activeShippingCost = deskPrice;
+        }
+
+        // Mise à jour de la ligne "Expédition" et du "Total"
+        shippingDisplay.textContent = formatPrice(activeShippingCost);
+        const grandTotal = baseSubtotal + activeShippingCost;
+        finalTotalDisplay.textContent = grandTotal.toFixed(2).replace('.', ',') + ' DA';
+
+        // Mise à jour de la classe CSS active
+        document.querySelectorAll('.shipping-item').forEach(item => item.classList.remove('selected'));
+        if (selectedRadio) {
+            selectedRadio.closest('.shipping-item').classList.add('selected');
+        }
+    }
+
+    // Événements d'écouteurs sur les entrées utilisateur
+    wilayaSelect.addEventListener('change', recalculateTotal);
+    shippingRadios.forEach(radio => {
+        radio.addEventListener('change', recalculateTotal);
+    });
+
+    // Exécution initiale au chargement de la page
+    recalculateTotal();
+});
+</script>
+<style>
+    * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: #ffffff;
+    color: #333333;
+}
+
+.checkout-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* --- Colonne Gauche --- */
+.checkout-left {
+    flex: 1.1;
+    padding: 40px 60px 40px 120px;
+    background: #ffffff;
+}
+
+.checkout-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.store-title {
+    font-size: 1.3rem;
+    font-weight: 500;
+}
+
+.cart-icon-link {
+    color: #0051ff;
+}
+
+.section-block {
+    margin-bottom: 35px;
+}
+
+.section-block h2 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 12px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.link-login {
+    color: #0051ff;
+    font-size: 0.85rem;
+    text-decoration: none;
+}
+
+/* Form inputs */
+.field-container {
+    position: relative;
+    margin-bottom: 12px;
+}
+
+.field-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.input-field {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1px solid #d9d9d9;
+    border-radius: 5px;
+    font-size: 0.88rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.input-field:focus {
+    border-color: #0051ff;
+    box-shadow: 0 0 0 1px #0051ff;
+}
+
+.info-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+    font-size: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: #333;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+/* Shipping Methods Box */
+.shipping-box, .billing-box {
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.shipping-item, .billing-item {
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+    border-bottom: 1px solid #e6e6e6;
+    cursor: pointer;
+    font-size: 0.85rem;
+    background: #fff;
+}
+
+.shipping-item:last-child, .billing-item:last-child {
+    border-bottom: none;
+}
+
+.shipping-item.selected, .billing-item.selected {
+    background-color: #f0f5ff;
+    border-color: #0051ff;
+}
+
+.shipping-item input, .billing-item input {
+    margin-right: 12px;
+    accent-color: #0051ff;
+}
+
+.shipping-details {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.shipping-title {
+    color: #333;
+    font-weight: 500;
+}
+
+.shipping-price {
+    font-weight: 600;
+}
+
+.shipping-price del {
+    color: #888;
+    font-weight: normal;
+    margin-right: 5px;
+}
+
+/* Payment Box */
+.sub-text {
+    font-size: 0.82rem;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.payment-box {
+    border: 1px solid #0051ff;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f0f5ff;
+}
+
+.payment-header {
+    padding: 14px 16px;
+    font-weight: 500;
+    font-size: 0.88rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.payment-body {
+    padding: 20px 16px;
+    background: #fafafa;
+    border-top: 1px solid #e6e6e6;
+    font-size: 0.85rem;
+    color: #555;
+    text-align: center;
+}
+
+/* Submit Button */
+.btn-submit-order {
+    width: 100%;
+    background-color: #0051ff;
+    color: #ffffff;
+    padding: 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.btn-submit-order:hover {
+    background-color: #0043d0;
+}
+
+.checkout-footer-links {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.checkout-footer-links a {
+    font-size: 0.75rem;
+    color: #0051ff;
+    text-decoration: underline;
+}
+
+/* --- Colonne Droite (Gris clair) --- */
+.checkout-right {
+    flex: 0.9;
+    background-color: #fafafa;
+    border-left: 1px solid #e6e6e6;
+    padding: 40px 120px 40px 40px;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.item-thumb {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+}
+
+.item-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.item-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #000;
+    color: #fff;
+    font-size: 0.75rem;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.item-info {
+    flex: 1;
+    margin-left: 15px;
+    font-size: 0.88rem;
+    font-weight: 500;
+}
+
+.item-price {
+    font-size: 0.88rem;
+    font-weight: 500;
+}
+
+.discount-block {
+    display: flex;
+    gap: 10px;
+    margin: 25px 0;
+}
+
+.discount-input {
+    flex: 1;
+    background: #fff;
+}
+
+.btn-apply-discount {
+    padding: 0 20px;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    color: #555;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.pricing-summary {
+    border-top: 1px solid #e6e6e6;
+    padding-top: 20px;
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.88rem;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.total-row {
+    border-top: 1px solid #e6e6e6;
+    padding-top: 15px;
+    margin-top: 15px;
+    font-size: 1.1rem;
+    color: #000;
+}
+
+.total-amount small {
+    font-size: 0.75rem;
+    color: #777;
+    margin-right: 5px;
+}
+</style>
+{% endblock %}

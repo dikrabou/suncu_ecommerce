@@ -1,0 +1,414 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="about-page">
+
+    <!-- Section 1 : Hero / Notre Histoire -->
+    <section class="about-hero">
+        <div class="hero-content">
+            <span class="sub-title">• NOTRE HISTOIRE</span>
+            <h1>À propos d'Optipharm</h1>
+            <div class="divider"></div>
+        </div>
+    </section>
+
+    <!-- Section 2 : L'Entreprise -->
+    <section class="about-company">
+        <div class="container">
+            <span class="sub-title">• L'ENTREPRISE</span>
+            <h2>La Maison Sunsu</h2>
+            <p class="highlight-text">
+                <strong>Sunsu</strong> est une gamme du laboratoire Optipharm et une destination santé de référence en Algérie, dédiée à l'art du bien-être professionnel et à l'innovation pharmaceutique.
+            </p>
+            <p>
+                En harmonisant des standards scientifiques rigoureux avec l'élégance locale, nous offrons une expérience soignée qui privilégie la qualité, la sécurité et l'accessibilité. Chaque produit de notre catalogue est méticuleusement conçu et soumis à des contrôles stricts pour répondre à nos exigences d'excellence.
+            </p>
+        </div>
+    </section>
+
+    <!-- Section 3 : Mission & Vision -->
+    <section class="about-mission-vision">
+        <div class="container grid-2">
+            <div class="mission-box">
+                <span class="sub-title">• NOTRE MISSION</span>
+                <h3>Valoriser la santé et le soin de soi</h3>
+                <p>Nous croyons que les soins de la peau et la santé vont au-delà de simples produits : ce sont des piliers essentiels pour la confiance et le bien-être au quotidien.</p>
+                
+                <ul class="features-list">
+                    <li>
+                        <div class="icon-circle">🔬</div>
+                        <div>
+                            <h4>Innover</h4>
+                            <p>Développer des formules scientifiques et respectueuses de la peau, garantissant des résultats sûrs et visibles.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="icon-circle">🎓</div>
+                        <div>
+                            <h4>Éduquer</h4>
+                            <p>Accompagner notre communauté avec des conseils d'experts en santé et des routines de soins adaptées.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="icon-circle">🖤</div>
+                        <div>
+                            <h4>Inspirer</h4>
+                            <p>Cultiver un univers où prendre soin de soi devient la fondation de l'assurance de chaque jour.</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="vision-box">
+                <span class="sub-title">• NOTRE VISION</span>
+                <h3>Une nouvelle référence en pharmacie</h3>
+                <p>Redéfinir le paysage de la santé et de la beauté en Afrique du Nord en devenant le point de repère incontournable de l'excellence médicale et de la transparence éthique.</p>
+                <p>Notre ambition est d'incarner un mouvement de confiance qui valorise la dermatologie, la rigueur scientifique et l'accessibilité pour tous.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4 : L'Équipe -->
+    <section class="about-team">
+        <div class="container grid-2-reverse">
+            <div class="team-image-wrapper">
+                <!-- Remplace par ton image ou une image de l'équipe -->
+                <img src="{% static 'images/2003.png' %}" alt="Équipe Optipharm">
+            </div>
+            <div class="team-text">
+                <span class="sub-title">• L'ÉQUIPE</span>
+                <h3>Conçu avec passion</h3>
+                <p>
+                    Derrière OPTIPHARM se trouve un collectif de pharmaciens passionnés, de chercheurs scientifiques et de spécialistes en logistique basés au cœur de l'Algérie. De la formulation en laboratoire jusqu'à l'attention portée au client, notre équipe veille à ce que chaque détail soit traité avec précision.
+                </p>
+                <p>
+                    Nous œuvrons sans relâche pour offrir un service fluide et une livraison rapide à travers le pays, apportant des solutions de santé professionnelles directement chez vous.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 5 : Les 3 Piliers (Le Standard Optipharm) -->
+    <section class="about-standard">
+        <div class="container">
+            <span class="sub-title">• POURQUOI CHOISIR OPTIPHARM</span>
+            <h2>Le Standard Optipharm</h2>
+            <div class="cards-grid">
+                <div class="standard-card">
+                    <div class="card-icon">🏛️</div>
+                    <h3>Héritage Algérien</h3>
+                    <p>Pensé avec une parfaite compréhension des besoins cliniques locaux et des réalités de notre environnement.</p>
+                </div>
+                <div class="standard-card">
+                    <div class="card-icon">⚗️</div>
+                    <h3>Qualité Professionnelle</h3>
+                    <p>Des formules testées en laboratoire, adaptées aussi bien aux soins quotidiens qu'aux recommandations d'experts.</p>
+                </div>
+                <div class="standard-card">
+                    <div class="card-icon">🌿</div>
+                    <h3>Exigence Éthique</h3>
+                    <p>Un engagement rigoureux envers des ingrédients sûrs, de haute pureté et des normes de fabrication responsables.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 6 : Appel à l'action final -->
+    <section class="about-cta">
+        <div class="container text-center">
+            <h2>Prêt à découvrir votre routine idéale ?</h2>
+            <p>Explorez notre collection exclusive et trouvez les soins parfaits pour votre peau.</p>
+            <div class="cta-buttons">
+                <a href="{% url 'home' %}" class="btn-primary">EXPLORER LA COLLECTION</a>
+                <a href="{% url 'contact' %}" class="btn-outline">NOUS CONTACTER</a>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<style>
+/* Style global de la page About - Fond Blanc / Texte Noir */
+.about-page {
+    background-color: #ffffff;
+    color: #111111;
+    font-family: 'Playfair Display', serif;
+    overflow-x: hidden;
+    padding-bottom: 80px;
+}
+
+.about-page h1, .about-page h2, .about-page h3 {
+    font-weight: 400;
+    letter-spacing: 1px;
+    color: #000000;
+}
+
+.about-page .sub-title {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #666666;
+    display: block;
+    margin-bottom: 15px;
+}
+
+.about-page .divider {
+    width: 60px;
+    height: 1px;
+    background-color: #cccccc;
+    margin: 20px auto 0 auto;
+}
+
+/* Sections communes */
+.about-page section {
+    padding: 80px 20px;
+    border-bottom: 1px solid #eeeeee;
+}
+
+.about-page .container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Grilles */
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    align-items: start;
+}
+
+.grid-2-reverse {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+}
+
+/* Hero Section avec Image de Fond (Corrigé et unique) */
+.about-hero {
+    position: relative;
+    text-align: center;
+    padding: 140px 20px;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('{% static "images/66.jpg" %}');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-bottom: 1px solid #eeeeee;
+}
+
+.about-hero h1 {
+    font-size: 48px;
+    color: #ffffff !important;
+}
+
+.about-hero .sub-title {
+    color: #e0e0e0 !important;
+}
+
+.about-hero .divider {
+    background-color: #ffffff !important;
+}
+
+/* Company Section */
+.about-company {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+.about-company h2 {
+    font-size: 36px;
+    margin-bottom: 25px;
+}
+.about-company p {
+    color: #555555;
+    line-height: 1.8;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+.highlight-text {
+    font-size: 18px !important;
+    color: #000000 !important;
+    font-weight: 500;
+}
+
+/* Mission & Vision (Style Cartes Élégantes) */
+.mission-box, 
+.vision-box {
+    background-color: #fafafa;
+    border: 1px solid #eaeaea;
+    padding: 50px 40px;
+    height: 100%;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+.mission-box:hover, 
+.vision-box:hover {
+    border-color: #000000;
+    background-color: #ffffff;
+}
+
+.mission-box h3, 
+.vision-box h3 {
+    font-size: 26px;
+    margin-bottom: 20px;
+}
+
+.mission-box > p, 
+.vision-box > p {
+    color: #555555;
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 20px;
+}
+
+/* Liste des fonctionnalités (Innover, Éduquer, Inspirer) */
+.features-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 30px;
+}
+.features-list li {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 25px;
+    align-items: flex-start;
+}
+.icon-circle {
+    width: 45px;
+    height: 45px;
+    border: 1px solid #dddddd;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: #ffffff;
+    font-size: 18px;
+}
+.features-list h4 {
+    font-size: 18px;
+    margin-bottom: 5px;
+    color: #000;
+}
+.features-list p {
+    color: #666666;
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Team Section */
+.team-image-wrapper img {
+    width: 100%;
+    border-radius: 4px;
+    filter: grayscale(100%);
+    transition: filter 0.5s ease;
+}
+.team-image-wrapper img:hover {
+    filter: grayscale(0%);
+}
+.team-text h3 {
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+.team-text p {
+    color: #555555;
+    line-height: 1.7;
+    margin-bottom: 15px;
+}
+
+/* Standards (3 cartes) */
+.about-standard {
+    text-align: center;
+}
+.about-standard h2 {
+    font-size: 34px;
+    margin-bottom: 50px;
+}
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+.standard-card {
+    background-color: #fafafa;
+    border: 1px solid #eaeaea;
+    padding: 40px 30px;
+    text-align: center;
+    transition: border-color 0.3s, background-color 0.3s;
+}
+.standard-card:hover {
+    border-color: #000000;
+    background-color: #ffffff;
+}
+.card-icon {
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+.standard-card h3 {
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+.standard-card p {
+    color: #666666;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* CTA Final */
+.about-cta {
+    text-align: center;
+    border-bottom: none;
+    background-color: #fafafa;
+}
+.about-cta h2 {
+    font-size: 38px;
+    margin-bottom: 15px;
+}
+.about-cta p {
+    color: #666666;
+    margin-bottom: 30px;
+}
+.cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+.btn-primary {
+    background-color: #000000;
+    color: #ffffff;
+    padding: 12px 30px;
+    text-decoration: none;
+    letter-spacing: 1px;
+    font-size: 13px;
+    transition: background 0.3s;
+}
+.btn-primary:hover {
+    background-color: #333333;
+}
+.btn-outline {
+    border: 1px solid #000000;
+    color: #000000;
+    padding: 12px 30px;
+    text-decoration: none;
+    letter-spacing: 1px;
+    font-size: 13px;
+    transition: background 0.3s, color 0.3s;
+}
+.btn-outline:hover {
+    background-color: #000000;
+    color: #ffffff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .grid-2, .grid-2-reverse, .cards-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% if items %}
+    {% for item in items %}
+        <div class="cart-item" style="display:flex; gap:12px; padding:12px 0; border-bottom:1px solid #eee; align-items:center;">
+            <img src="{{ item.image_url }}" alt="{{ item.name }}" style="width:55px; height:55px; object-fit:cover; border-radius:4px;" onerror="this.onerror=null; this.src='/static/images/default-product.png';">
+            <div style="flex:1;">
+                <h4 style="font-size:14px; margin:0 0 4px; color:#333;">{{ item.name }}</h4>
+                <p style="font-size:13px; color:#666; margin:0 0 6px;">{{ item.price|floatformat:2 }} DZD</p>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <button type="button" onclick="changeQuantity('{{ item.id }}', 'decrease')" style="border:1px solid #ccc; background:#fff; width:24px; height:24px; cursor:pointer;">-</button>
+                    <span style="font-size:13px; font-weight:600;">{{ item.quantity }}</span>
+                    <button type="button" onclick="changeQuantity('{{ item.id }}', 'increase')" style="border:1px solid #ccc; background:#fff; width:24px; height:24px; cursor:pointer;">+</button>
+                </div>
+            </div>
+            <button type="button" onclick="removeFromCart('{{ item.id }}')" style="background:none; border:none; color:#999; cursor:pointer; font-size:18px;">&times;</button>
+        </div>
+    {% endfor %}
+{% else %}
+    <p style="padding:30px; text-align:center; color:#666;">Votre panier est vide.</p>
+{% endif %}
