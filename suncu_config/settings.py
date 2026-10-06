@@ -25,8 +25,11 @@ SECRET_KEY = 'django-insecure-#w6i-yf1wz7xwh)9sj37)0-c0kch_5v@@q%*yq26mgnvr$u$5o
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['suncu-ecommerce-3.onrender.com', '127.0.0.1', 'localhost']
-
+ALLOWED_HOSTS = [
+    'suncu-ecommerce-5.onrender.com',
+    'localhost',
+    '127.0.0.1',
+]
 # Application definition
 
 INSTALLED_APPS = [
@@ -119,7 +122,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
