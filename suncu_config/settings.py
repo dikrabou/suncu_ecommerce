@@ -25,11 +25,7 @@ SECRET_KEY = 'django-insecure-#w6i-yf1wz7xwh)9sj37)0-c0kch_5v@@q%*yq26mgnvr$u$5o
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    'suncu-ecommerce-5.onrender.com',
-    'localhost',
-    '127.0.0.1',
-]
+ALLOWED_HOSTS = ['suncu-ecommerce-7.onrender.com', '.onrender.com', '127.0.0.1', 'localhost']
 # Application definition
 
 INSTALLED_APPS = [
