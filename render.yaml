@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: suncu-ecommerce
+    env: python
+    region: frankfurt # ou ta région actuelle
+    plan: free
+    pythonVersion: 3.11.9
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate"
+    startCommand: "gunicorn suncu_config.wsgi:application"
