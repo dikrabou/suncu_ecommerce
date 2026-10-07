@@ -64,25 +64,27 @@ from django.shortcuts import render, get_object_or_404
 from .models import UsageType, Product, BeforeAfter
 
 def catalog_view(request, usage_slug=None):
-    # Récupère l'objet UsageType ou renvoie une erreur 404
-    current_usage = get_object_or_404(UsageType, slug=usage_slug)
-    
-    # Récupère tous les produits actifs associés à cet usage_type
-    products = Product.objects.filter(
-        usage_types=current_usage,
-        is_active=True
-    ).distinct()
-    
-    # Récupère le premier BeforeAfter associé à l'un des produits de cet UsageType
-    before_after = BeforeAfter.objects.filter(product__usage_types=current_usage).first()
+    if usage_slug:
+        # 1. Si un filtre par usage est spécifié dans l'URL
+        current_usage = get_object_or_404(UsageType, slug=usage_slug)
+        
+        products = Product.objects.filter(
+            usage_types=current_usage,
+            is_active=True
+        ).distinct()
+        
+        before_after = BeforeAfter.objects.filter(product__usage_types=current_usage).first()
+    else:
+        # 2. Si aucun filtre n'est fourni (affichage de tous les produits)
+        current_usage = None
+        products = Product.objects.filter(is_active=True)
+        before_after = None
     
     return render(request, 'store/catalog.html', {
         'current_usage': current_usage,
         'products': products,
         'before_after': before_after,
     })
-
-
 from django.shortcuts import render, get_object_or_404
 from .models import Product, BeforeAfter  # Assure-toi d'importer BeforeAfter
 

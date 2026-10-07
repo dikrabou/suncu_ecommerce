@@ -3,6 +3,7 @@ from .views import home_view
 from .views import catalog_view,product_detail,add_to_cart,store_review,about_view,remove_from_cart,search_api,contact_view, update_cart_qty,get_cart_json,checkout_view,buy_now_view,order_success_view,promo_products_list
 urlpatterns = [
  path('', home_view, name='home'),
+ path('catalog/', catalog_view, name='catalog'),
     path('catalog/<slug:usage_slug>/', catalog_view, name='catalog'),
     path('product/<slug:slug>/', product_detail, name='product_detail'),
     
