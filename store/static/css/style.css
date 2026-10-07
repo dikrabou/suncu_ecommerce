@@ -1558,15 +1558,16 @@ ul {
 }
 
 /* Style de l'élément VIDEO (Remplaçant .media-image) */
+.video-hero-section {
+    background-color: #1a1a1a; /* Couleur de fond pour remplir les côtés vides */
+}
+
 .media-video {
     width: 100%;
     height: 100%;
-    object-fit: cover; 
+    object-fit: contain; /* Affiche l'image en entier sans rien couper */
     display: block;
     filter: brightness(0.7); 
-    
-    /* Ajuste ce pourcentage pour caler l'image exactement où tu veux */
-    object-position: center 50%; 
 }
 /* ------------------------------------------- */
 /* Text Overlay on Media */
