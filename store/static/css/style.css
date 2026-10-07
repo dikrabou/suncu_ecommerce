@@ -1561,14 +1561,12 @@ ul {
 .media-video {
     width: 100%;
     height: 100%;
-    /* Remplit tout l'espace */
     object-fit: cover; 
     display: block;
     filter: brightness(0.7); 
-
-    /* AJOUTEZ CECI : Force l'image à s'aligner en haut. */
-    /* Cela permet de ne pas couper le visage du produit en haut et le texte en bas */
-    object-position: top center; 
+    
+    /* Ajuste ce pourcentage pour caler l'image exactement où tu veux */
+    object-position: center 35%; 
 }
 /* ------------------------------------------- */
 /* Text Overlay on Media */
