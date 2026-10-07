@@ -1562,7 +1562,7 @@ ul {
     width: 100%;
     height: 100%;
     /* Rend la vidéo comme un fond : elle couvre la zone sans déformer ses proportions */
-    object-fit: cover; 
+    object-fit: contain; 
     display: block;
     /* Assombrissement léger pour que le texte blanc soit plus lisible */
     filter: brightness(0.7); 
