@@ -1561,13 +1561,15 @@ ul {
 .media-video {
     width: 100%;
     height: 100%;
-    /* Rend la vidéo comme un fond : elle couvre la zone sans déformer ses proportions */
-    object-fit: contain; 
+    /* Remplit tout l'espace */
+    object-fit: cover; 
     display: block;
-    /* Assombrissement léger pour que le texte blanc soit plus lisible */
     filter: brightness(0.7); 
-}
 
+    /* AJOUTEZ CECI : Force l'image à s'aligner en haut. */
+    /* Cela permet de ne pas couper le visage du produit en haut et le texte en bas */
+    object-position: top center; 
+}
 /* ------------------------------------------- */
 /* Text Overlay on Media */
 /* ------------------------------------------- */
