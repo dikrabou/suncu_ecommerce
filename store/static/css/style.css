@@ -1566,7 +1566,7 @@ ul {
     filter: brightness(0.7); 
     
     /* Ajuste ce pourcentage pour caler l'image exactement où tu veux */
-    object-position: center 10%; 
+    object-position: center 50%; 
 }
 /* ------------------------------------------- */
 /* Text Overlay on Media */
